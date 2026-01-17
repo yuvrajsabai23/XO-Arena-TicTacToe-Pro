@@ -1,0 +1,78 @@
+:root {
+  /* Core Palette - DARK MODE ONLY */
+  --bg-app: #0f172a;
+  --bg-panel: rgba(15, 23, 42, 0.8);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --glass-border: rgba(255, 255, 255, 0.15);
+
+  --color-cyan: #06b6d4;
+  --color-violet: #8b5cf6;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+/* Mica Effect */
+.glass-panel {
+  background: var(--bg-panel);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Shake Animation */
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+.shake {
+  animation: shake 0.3s ease-in-out;
+}
+
+/* Utility */
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.absolute-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
