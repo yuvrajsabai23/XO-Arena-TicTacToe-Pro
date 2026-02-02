@@ -71,25 +71,25 @@
         },
         {
             "src": "screenshots/game-screen1.png",
-            "sizes": "1072x603",
+            "sizes": "1071x601",
             "type": "image/png",
             "form_factor": "wide"
         },
         {
             "src": "screenshots/game-screen2.png",
-            "sizes": "1076x606",
+            "sizes": "1089x599",
             "type": "image/png",
             "form_factor": "wide"
         },
         {
             "src": "screenshots/result-screen.png",
-            "sizes": "1076x606",
+            "sizes": "1072x601",
             "type": "image/png",
             "form_factor": "wide"
         },
         {
             "src": "screenshots/howtoplay-screen.png",
-            "sizes": "1072x603",
+            "sizes": "1070x601",
             "type": "image/png",
             "form_factor": "wide"
         }
