@@ -1,11 +1,13 @@
 const VERSION = 'v1.0.0';
-const CACHE_NAME = 'xo-arena-v1.4';
+const CACHE_NAME = 'xo-arena-v2.0';
 
 // Assets to pre-cache
 const CACHE_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png'
 ];
 
 // Install Event
