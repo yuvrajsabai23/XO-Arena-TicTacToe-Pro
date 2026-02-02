@@ -20,40 +20,16 @@
     "orientation": "any",
     "icons": [
         {
-            "src": "icons/icon-44.png",
-            "sizes": "44x44",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "icons/icon-50.png",
-            "sizes": "50x50",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "icons/icon-150.png",
-            "sizes": "150x150",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "icons/icon-192.png",
+            "src": "/icons/icon-192.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any"
         },
         {
-            "src": "icons/icon-512.png",
+            "src": "/icons/icon-512.png",
             "sizes": "512x512",
             "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "icons/icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
+            "purpose": "any maskable"
         }
     ],
     "screenshots": [
