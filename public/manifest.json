@@ -67,7 +67,7 @@
             "src": "screenshots/start-screen.png",
             "sizes": "1072x603",
             "type": "image/png",
-            "form_factor": "wide"
+            "form_factor": "narrow"
         },
         {
             "src": "screenshots/game-screen1.png",
@@ -95,6 +95,9 @@
         }
     ],
     "iarc_rating_id": "4cc3df21-f361-4984-a984-a804541a0112",
-    "related_applications": [],
-    "prefer_related_applications": false
+    "scope_extensions": [
+        {
+            "origin": "https://xo-arena-tic-tac-toe-pro.vercel.app"
+        }
+    ]
 }
