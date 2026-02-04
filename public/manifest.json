@@ -1,5 +1,5 @@
 {
-    "name": "XO Arena TicTacToe Pro",
+    "name": "XO Arena - TicTacToe Pro",
     "short_name": "XO Arena",
     "description": "A high-fidelity, Fluent Design TicTacToe experience featuring reactive character entities and an unbeatable Grandmaster AI.",
     "id": "/",
@@ -29,7 +29,13 @@
             "src": "/icons/icon-512.png",
             "sizes": "512x512",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
         }
     ],
     "screenshots": [
@@ -70,7 +76,7 @@
             "form_factor": "wide"
         }
     ],
-    "iarc_rating_id": "4cc3df21-f361-4984-a984-a804541a0112",
+    "iarc_rating_id": "67849415-d304-4ada-ba9a-275bc240c909",
     "scope_extensions": [
         {
             "origin": "https://xo-arena-tic-tac-toe-pro.vercel.app"
