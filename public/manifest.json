@@ -1,6 +1,6 @@
 {
     "name": "XO Arena - TicTacToe Pro",
-    "short_name": "XO Arena",
+    "short_name": "XO Arena - TicTacToe Pro",
     "description": "A high-fidelity, Fluent Design TicTacToe experience featuring reactive character entities and an unbeatable Grandmaster AI.",
     "id": "/",
     "start_url": "/",
