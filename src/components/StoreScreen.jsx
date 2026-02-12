@@ -528,15 +528,21 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
               </motion.button>
 
               <motion.button
-                onClick={() => setShowPremiumModal(false)}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowPremiumModal(false);
+                }}
                 whileHover={{ opacity: 0.8 }}
+                whileTap={{ scale: 0.95 }}
                 style={{
                   marginTop: '15px',
                   background: 'transparent',
                   border: 'none',
                   color: 'var(--text-secondary)',
                   cursor: 'pointer',
-                  fontSize: '14px'
+                  fontSize: '14px',
+                  padding: '10px 20px'
                 }}
               >
                 Maybe later
