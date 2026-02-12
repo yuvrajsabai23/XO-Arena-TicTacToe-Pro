@@ -6,14 +6,21 @@ import Arbiter from './components/Arbiter';
 import StartScreen from './components/StartScreen';
 import HowToPlay from './components/HowToPlay';
 import GameOverlay from './components/GameOverlay';
-import { checkWinner, isDraw, getBestMove } from './logic/minimax';
+import StoreScreen from './components/StoreScreen';
+import DifficultySelector from './components/DifficultySelector';
+import { checkWinner, isDraw, getBestMove, DIFFICULTY } from './logic/minimax';
 import { audio } from './logic/audio';
+import { applyTheme } from './themes/themes';
+import { getSelectedItems, setSelectedItem } from './store/purchases';
+import { syncPurchases } from './store/msStore';
 
 // App States
 const APP_STATE = {
   HOME: 'HOME',
   MODE_SELECT: 'MODE_SELECT',
+  DIFFICULTY_SELECT: 'DIFFICULTY_SELECT',
   GAME: 'GAME',
+  STORE: 'STORE',
 };
 
 import ModeSelection from './components/ModeSelection';
@@ -27,6 +34,11 @@ const App = () => {
   // Game Config
   const [gameMode, setGameMode] = useState('PvAI'); // 'PvAI' or 'PvP'
 
+  // Customization State
+  const [currentTheme, setCurrentTheme] = useState('default');
+  const [currentSkin, setCurrentSkin] = useState('default');
+  const [currentDifficulty, setCurrentDifficulty] = useState(DIFFICULTY.GRANDMASTER);
+
   // Game State
   const [squares, setSquares] = useState(Array(9).fill(null));
   const [isXNext, setIsXNext] = useState(true);
@@ -38,11 +50,39 @@ const App = () => {
   // Logic Lock
   const isProcessing = React.useRef(false);
 
-  // Initialize Audio
+  // Initialize on mount
   useEffect(() => {
     audio.init();
     window.audio = audio; // Expose for debugging/testing
+
+    // Load saved preferences
+    const saved = getSelectedItems();
+    setCurrentTheme(saved.theme || 'default');
+    setCurrentSkin(saved.skin || 'default');
+    setCurrentDifficulty(saved.difficulty || DIFFICULTY.GRANDMASTER);
+
+    // Apply saved theme
+    applyTheme(saved.theme || 'default');
+
+    // Sync purchases from Microsoft Store
+    syncPurchases();
   }, []);
+
+  // Apply theme when it changes
+  useEffect(() => {
+    applyTheme(currentTheme);
+    setSelectedItem('theme', currentTheme);
+  }, [currentTheme]);
+
+  // Save skin preference
+  useEffect(() => {
+    setSelectedItem('skin', currentSkin);
+  }, [currentSkin]);
+
+  // Save difficulty preference
+  useEffect(() => {
+    setSelectedItem('difficulty', currentDifficulty);
+  }, [currentDifficulty]);
 
   const handleStart = () => {
     setAppState(APP_STATE.MODE_SELECT);
@@ -53,12 +93,35 @@ const App = () => {
     audio.speak("Welcome to X O Arena. Select your protocol.");
   };
 
+  const handleStore = () => {
+    setAppState(APP_STATE.STORE);
+  };
+
   const selectMode = (mode) => {
     setGameMode(mode);
+    if (mode === 'PvAI') {
+      setAppState(APP_STATE.DIFFICULTY_SELECT);
+    } else {
+      setAppState(APP_STATE.GAME);
+      resetGame();
+      audio.startBGM();
+      audio.speak("Multiplayer Engaged.");
+    }
+  };
+
+  const selectDifficulty = (difficulty) => {
+    setCurrentDifficulty(difficulty);
     setAppState(APP_STATE.GAME);
     resetGame();
-    audio.startBGM(); // Start BGM on game entry
-    audio.speak(mode === 'PvAI' ? "Initiating Grandmaster Protocol." : "Multiplayer Engaged.");
+    audio.startBGM();
+
+    const diffNames = {
+      rookie: 'Rookie',
+      pro: 'Pro',
+      grandmaster: 'Grandmaster',
+      chaos: 'Chaos'
+    };
+    audio.speak(`Initiating ${diffNames[difficulty]} Protocol.`);
   };
 
   const handleHome = () => {
@@ -72,6 +135,15 @@ const App = () => {
     setIsMuted(muted);
   };
 
+  const handlePurchaseComplete = () => {
+    // Reload preferences after purchase
+    const saved = getSelectedItems();
+    setCurrentTheme(saved.theme || 'default');
+    setCurrentSkin(saved.skin || 'default');
+    setCurrentDifficulty(saved.difficulty || DIFFICULTY.GRANDMASTER);
+    applyTheme(saved.theme || 'default');
+  };
+
   // AI Turn Logic
   useEffect(() => {
     if (gameMode === 'PvAI' && !isXNext && !winner && !isDraw(squares) && appState === APP_STATE.GAME) {
@@ -79,7 +151,7 @@ const App = () => {
       isProcessing.current = true; // Lock for AI
 
       const timeout = setTimeout(() => {
-        const bestMove = getBestMove(squares, 'O');
+        const bestMove = getBestMove(squares, 'O', currentDifficulty);
         if (bestMove !== -1) {
           handleMove(bestMove, true); // Verified move from AI
         }
@@ -88,7 +160,7 @@ const App = () => {
       }, 800);
       return () => clearTimeout(timeout);
     }
-  }, [isXNext, winner, squares, gameMode, appState]);
+  }, [isXNext, winner, squares, gameMode, appState, currentDifficulty]);
 
   const handleMove = (index, isAiParams = false) => {
     // Logic Gate:
@@ -164,6 +236,7 @@ const App = () => {
         <StartScreen
           onStart={handleStart}
           onHowToPlay={() => setShowHowToPlay(true)}
+          onStore={handleStore}
         />
         {showHowToPlay && <HowToPlay onClose={() => setShowHowToPlay(false)} />}
       </>
@@ -171,13 +244,43 @@ const App = () => {
   }
 
   if (appState === APP_STATE.MODE_SELECT) {
-    return <ModeSelection onSelect={selectMode} />;
+    return <ModeSelection onSelect={selectMode} onBack={handleHome} />;
+  }
+
+  if (appState === APP_STATE.DIFFICULTY_SELECT) {
+    return (
+      <div className="flex-center" style={{ height: '100vh' }}>
+        <DifficultySelector
+          selectedDifficulty={currentDifficulty}
+          onSelect={selectDifficulty}
+          onBack={() => setAppState(APP_STATE.MODE_SELECT)}
+        />
+      </div>
+    );
+  }
+
+  if (appState === APP_STATE.STORE) {
+    return (
+      <StoreScreen
+        onBack={handleHome}
+        onPurchaseComplete={handlePurchaseComplete}
+      />
+    );
   }
 
   // GAME VIEW
+  const difficultyLabel = {
+    rookie: 'Rookie',
+    pro: 'Pro',
+    grandmaster: 'Grandmaster',
+    chaos: 'Chaos'
+  };
+
   const status = winner
     ? (winner === 'draw' ? "Stalemate" : `${winner === 'X' ? 'Unit X' : 'Core O'} Wins`)
-    : (gameMode === 'PvAI' && !isXNext ? "Grandmaster Thinking..." : (isXNext ? "Player X Turn" : "Player O Turn"));
+    : (gameMode === 'PvAI' && !isXNext
+        ? `${difficultyLabel[currentDifficulty]} Thinking...`
+        : (isXNext ? "Player X Turn" : "Player O Turn"));
 
   return (
     <div className="flex-center" style={{ flexDirection: 'column', height: '100vh', gap: '2rem' }}>
@@ -196,6 +299,11 @@ const App = () => {
           <Arbiter />
         </div>
         <h1 style={{ fontSize: '1rem', letterSpacing: '2px', opacity: 0.7 }}>XO ARENA</h1>
+        {gameMode === 'PvAI' && (
+          <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', opacity: 0.6 }}>
+            {difficultyLabel[currentDifficulty]} Mode
+          </span>
+        )}
       </div>
 
       {/* Board */}
@@ -219,7 +327,7 @@ const App = () => {
             className={`flex-center ${shakeIndex === i ? 'shake' : ''}`}
             style={{
               backgroundColor: 'rgba(15, 23, 42, 0.8)',
-              border: '2px solid #06b6d4', // OPAQUE CYAN for maximum visibility
+              border: '2px solid var(--color-cyan)',
               borderRadius: '12px',
               cursor: (!square && !winner && (!isAiThinking || gameMode === 'PvP')) ? 'pointer' : 'default',
               position: 'relative',
@@ -228,8 +336,8 @@ const App = () => {
             }}
           >
             <AnimatePresence>
-              {square === 'X' && <div style={{ padding: '15%' }}><UnitX /></div>}
-              {square === 'O' && <div style={{ padding: '15%' }}><CoreO /></div>}
+              {square === 'X' && <div style={{ padding: '15%' }}><UnitX skin={currentSkin} /></div>}
+              {square === 'O' && <div style={{ padding: '15%' }}><CoreO skin={currentSkin} /></div>}
             </AnimatePresence>
 
             {winningLine?.includes(i) && (

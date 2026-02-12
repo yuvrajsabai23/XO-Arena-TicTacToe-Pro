@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Arbiter from './Arbiter';
 
-const StartScreen = ({ onStart, onHowToPlay }) => {
+const StartScreen = ({ onStart, onHowToPlay, onStore }) => {
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -89,6 +89,24 @@ const StartScreen = ({ onStart, onHowToPlay }) => {
                     }}
                 >
                     HOW TO PLAY
+                </button>
+
+                <button
+                    onClick={onStore}
+                    style={{
+                        width: '100%',
+                        padding: '16px',
+                        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.2))',
+                        border: '1px solid var(--color-violet)',
+                        color: 'var(--color-violet)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                    }}
+                >
+                    <span>STORE</span>
                 </button>
             </motion.div>
 

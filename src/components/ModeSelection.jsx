@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import UnitX from './UnitX';
 import Arbiter from './Arbiter';
 
-const ModeSelection = ({ onSelect }) => {
+const ModeSelection = ({ onSelect, onBack }) => {
     return (
         <div className="flex-center mode-selection" style={{ flexDirection: 'column', height: '100vh', gap: '2rem' }}>
             <h2 style={{
@@ -74,6 +74,26 @@ const ModeSelection = ({ onSelect }) => {
                     </div>
                 </motion.div>
             </div>
+
+            {onBack && (
+                <motion.button
+                    onClick={onBack}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{
+                        marginTop: '1rem',
+                        padding: '10px 30px',
+                        background: 'transparent',
+                        border: '1px solid var(--glass-border)',
+                        color: 'var(--text-secondary)',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontSize: '0.9rem'
+                    }}
+                >
+                    ← Back
+                </motion.button>
+            )}
         </div>
     );
 };
