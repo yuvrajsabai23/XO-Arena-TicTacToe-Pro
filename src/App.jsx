@@ -8,11 +8,16 @@ import HowToPlay from './components/HowToPlay';
 import GameOverlay from './components/GameOverlay';
 import StoreScreen from './components/StoreScreen';
 import DifficultySelector from './components/DifficultySelector';
+import CoinDisplay, { GameConsumables } from './components/CoinDisplay';
 import { checkWinner, isDraw, getBestMove, DIFFICULTY } from './logic/minimax';
 import { audio } from './logic/audio';
 import { applyTheme } from './themes/themes';
 import { getSelectedItems, setSelectedItem } from './store/purchases';
 import { syncPurchases } from './store/msStore';
+import {
+  getHints, getUndos, getShields, getWinStreak,
+  useHint, useUndo, incrementWinStreak, resetWinStreak
+} from './store/coinManager';
 
 // App States
 const APP_STATE = {
@@ -47,6 +52,15 @@ const App = () => {
   const [isAiThinking, setIsAiThinking] = useState(false);
   const [shakeIndex, setShakeIndex] = useState(null);
 
+  // Consumables State
+  const [hints, setHints] = useState(0);
+  const [undos, setUndos] = useState(0);
+  const [shields, setShields] = useState(0);
+  const [winStreak, setWinStreak] = useState(0);
+  const [hintSquare, setHintSquare] = useState(null);
+  const [moveHistory, setMoveHistory] = useState([]);
+  const [bonusCoinsEarned, setBonusCoinsEarned] = useState(0);
+
   // Logic Lock
   const isProcessing = React.useRef(false);
 
@@ -66,7 +80,18 @@ const App = () => {
 
     // Sync purchases from Microsoft Store
     syncPurchases();
+
+    // Load consumables
+    updateConsumables();
   }, []);
+
+  // Update consumables from storage
+  const updateConsumables = () => {
+    setHints(getHints());
+    setUndos(getUndos());
+    setShields(getShields());
+    setWinStreak(getWinStreak());
+  };
 
   // Apply theme when it changes
   useEffect(() => {
@@ -142,6 +167,8 @@ const App = () => {
     setCurrentSkin(saved.skin || 'default');
     setCurrentDifficulty(saved.difficulty || DIFFICULTY.GRANDMASTER);
     applyTheme(saved.theme || 'default');
+    // Update consumables
+    updateConsumables();
   };
 
   // AI Turn Logic
@@ -190,10 +217,16 @@ const App = () => {
       // If PvAI, the useEffect will pick up the turn change and keep it locked.
     }
 
+    // Save move history for undo (before making the move)
+    setMoveHistory(prev => [...prev, { squares: [...squares], isXNext }]);
+
     const newSquares = [...squares];
     const player = isXNext ? 'X' : 'O';
     newSquares[index] = player;
     setSquares(newSquares);
+
+    // Clear hint when move is made
+    setHintSquare(null);
 
     audio.playSFX('move'); // Play Move Sound
 
@@ -202,7 +235,25 @@ const App = () => {
       setWinner(result.winner);
       setWinningLine(result.line);
       audio.playSFX('win'); // Play Win Sound
-      audio.speak(result.winner === 'X' ? "Victory." : "Defeated.");
+
+      // Handle win streak (only for player X wins in PvAI)
+      if (gameMode === 'PvAI' && result.winner === 'X') {
+        const streakResult = incrementWinStreak();
+        setWinStreak(streakResult.winStreak);
+        if (streakResult.bonusCoins > 0) {
+          setBonusCoinsEarned(streakResult.bonusCoins);
+        }
+        audio.speak("Victory.");
+      } else if (gameMode === 'PvAI' && result.winner === 'O') {
+        // Player lost - reset win streak (shield may protect)
+        const streakResult = resetWinStreak();
+        setWinStreak(streakResult.winStreak);
+        setShields(getShields());
+        audio.speak(streakResult.shieldUsed ? "Shield activated. Streak protected." : "Defeated.");
+      } else {
+        audio.speak(result.winner === 'X' ? "Player X wins." : "Player O wins.");
+      }
+
       isProcessing.current = false; // Release lock on end game
     } else if (isDraw(newSquares)) {
       setWinner('draw');
@@ -225,7 +276,69 @@ const App = () => {
     setWinner(null);
     setWinningLine(null);
     setIsAiThinking(false);
+    setHintSquare(null);
+    setMoveHistory([]);
+    setBonusCoinsEarned(0);
     isProcessing.current = false; // Ensure unlocked
+  };
+
+  // Handle hint usage
+  const handleHint = () => {
+    if (winner || isAiThinking) return;
+    if (hints <= 0) {
+      audio.playSFX('error');
+      return;
+    }
+
+    // Use a hint
+    const result = useHint();
+    if (result.success) {
+      setHints(result.remaining);
+
+      // Get the best move for current player
+      const currentPlayer = isXNext ? 'X' : 'O';
+      const bestMove = getBestMove(squares, currentPlayer, DIFFICULTY.GRANDMASTER);
+
+      if (bestMove !== -1) {
+        setHintSquare(bestMove);
+        audio.speak("Hint revealed.");
+
+        // Clear hint after 3 seconds
+        setTimeout(() => setHintSquare(null), 3000);
+      }
+    }
+  };
+
+  // Handle undo
+  const handleUndo = () => {
+    if (winner || isAiThinking || moveHistory.length === 0) return;
+    if (undos <= 0) {
+      audio.playSFX('error');
+      return;
+    }
+
+    const result = useUndo();
+    if (result.success) {
+      setUndos(result.remaining);
+
+      // In PvAI, undo both player and AI moves
+      if (gameMode === 'PvAI' && moveHistory.length >= 2) {
+        // Restore to state before last two moves
+        const prevState = moveHistory[moveHistory.length - 2];
+        setSquares(prevState.squares);
+        setIsXNext(prevState.isXNext);
+        setMoveHistory(moveHistory.slice(0, -2));
+      } else if (gameMode === 'PvP' && moveHistory.length >= 1) {
+        // Restore to state before last move
+        const prevState = moveHistory[moveHistory.length - 1];
+        setSquares(prevState.squares);
+        setIsXNext(prevState.isXNext);
+        setMoveHistory(moveHistory.slice(0, -1));
+      }
+
+      setHintSquare(null);
+      audio.speak("Move undone.");
+    }
   };
 
   // --- RENDER HELPERS ---
@@ -283,27 +396,55 @@ const App = () => {
         : (isXNext ? "Player X Turn" : "Player O Turn"));
 
   return (
-    <div className="flex-center" style={{ flexDirection: 'column', height: '100vh', gap: '2rem' }}>
+    <div className="flex-center" style={{ flexDirection: 'column', height: '100vh', gap: '1.5rem', padding: '10px' }}>
 
-      {/* Audio Toggle */}
-      <button
-        onClick={toggleMute}
-        style={{ position: 'absolute', top: '20px', right: '20px', padding: '10px', borderRadius: '50%', zIndex: 50 }}
-      >
-        {isMuted ? '🔇' : '🔊'}
-      </button>
+      {/* Top Bar */}
+      <div style={{
+        position: 'absolute',
+        top: '15px',
+        left: '15px',
+        right: '15px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        zIndex: 50
+      }}>
+        {/* Coin Display */}
+        <CoinDisplay compact onCoinClick={handleStore} />
+
+        {/* Audio Toggle */}
+        <button
+          onClick={toggleMute}
+          style={{ padding: '10px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '1px solid var(--glass-border)' }}
+        >
+          {isMuted ? '🔇' : '🔊'}
+        </button>
+      </div>
 
       {/* Header */}
-      <div className="flex-center" style={{ flexDirection: 'column', gap: '1rem' }}>
-        <div style={{ width: '60px', height: '60px' }}>
+      <div className="flex-center" style={{ flexDirection: 'column', gap: '0.5rem', marginTop: '50px' }}>
+        <div style={{ width: '50px', height: '50px' }}>
           <Arbiter />
         </div>
-        <h1 style={{ fontSize: '1rem', letterSpacing: '2px', opacity: 0.7 }}>XO ARENA</h1>
-        {gameMode === 'PvAI' && (
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', opacity: 0.6 }}>
-            {difficultyLabel[currentDifficulty]} Mode
-          </span>
-        )}
+        <h1 style={{ fontSize: '1rem', letterSpacing: '2px', opacity: 0.7, margin: 0 }}>XO ARENA</h1>
+        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+          {gameMode === 'PvAI' && (
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', opacity: 0.6 }}>
+              {difficultyLabel[currentDifficulty]} Mode
+            </span>
+          )}
+          {winStreak > 0 && (
+            <span style={{
+              fontSize: '0.7rem',
+              color: '#ff4500',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '3px'
+            }}>
+              🔥 {winStreak} Streak
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Board */}
@@ -352,9 +493,46 @@ const App = () => {
                 }}
               />
             )}
+
+            {/* Hint Highlight */}
+            {hintSquare === i && !square && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundColor: 'rgba(255, 215, 0, 0.3)',
+                  boxShadow: '0 0 30px rgba(255, 215, 0, 0.5)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <motion.span
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 0.5, repeat: Infinity }}
+                  style={{ fontSize: '24px' }}
+                >
+                  💡
+                </motion.span>
+              </motion.div>
+            )}
           </div>
         ))}
       </div>
+
+      {/* Game Consumables (Hint/Undo) */}
+      {!winner && gameMode === 'PvAI' && (
+        <GameConsumables
+          hints={hints}
+          undos={undos}
+          shields={shields}
+          winStreak={winStreak}
+          onHintClick={handleHint}
+          onUndoClick={handleUndo}
+        />
+      )}
 
       {/* Status & Controls */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>

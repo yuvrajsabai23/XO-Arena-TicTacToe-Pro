@@ -5,8 +5,13 @@ import { skins, skinBundle } from '../themes/skins';
 import { difficultyConfig, difficultyPack } from '../logic/minimax';
 import { isItemOwned, premiumBundle, getSelectedItems, setSelectedItem } from '../store/purchases';
 import { purchaseProduct, isStoreAvailable } from '../store/msStore';
+import {
+  getCoins, getHints, getUndos, getShields, getSpins,
+  COIN_PACKS, SPIN_PACKS, CONSUMABLE_PACKS, MEGA_BUNDLES
+} from '../store/coinManager';
 import UnitX from './UnitX';
 import CoreO from './CoreO';
+import LuckySpin from './LuckySpin';
 
 const StoreScreen = ({ onBack, onPurchaseComplete }) => {
   const [activeTab, setActiveTab] = useState('themes');
@@ -15,9 +20,14 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
   const [selected, setSelected] = useState(getSelectedItems());
   const [previewSkin, setPreviewSkin] = useState(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [showLuckySpin, setShowLuckySpin] = useState(false);
+  const [consumables, setConsumables] = useState({
+    coins: 0, hints: 0, undos: 0, shields: 0, spins: 0
+  });
 
   useEffect(() => {
     updateOwnedItems();
+    updateConsumables();
   }, []);
 
   const updateOwnedItems = () => {
@@ -29,12 +39,23 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
     setOwned(ownedItems);
   };
 
+  const updateConsumables = () => {
+    setConsumables({
+      coins: getCoins(),
+      hints: getHints(),
+      undos: getUndos(),
+      shields: getShields(),
+      spins: getSpins()
+    });
+  };
+
   const handlePurchase = async (productKey) => {
     setPurchasing(productKey);
     try {
       const result = await purchaseProduct(productKey);
       if (result.success) {
         updateOwnedItems();
+        updateConsumables();
         if (onPurchaseComplete) {
           onPurchaseComplete();
         }
@@ -56,10 +77,12 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
   };
 
   const tabs = [
+    { id: 'coins', label: 'COINS', icon: '🪙' },
+    { id: 'spins', label: 'SPINS', icon: '🎰' },
     { id: 'themes', label: 'THEMES', icon: '🎨' },
     { id: 'skins', label: 'SKINS', icon: '✨' },
-    { id: 'difficulty', label: 'AI MODES', icon: '🤖' },
-    { id: 'bundles', label: 'BUNDLES', icon: '👑' }
+    { id: 'difficulty', label: 'AI', icon: '🤖' },
+    { id: 'bundles', label: 'MEGA', icon: '👑' }
   ];
 
   return (
@@ -276,6 +299,129 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
             zIndex: 10
           }}
         >
+          {activeTab === 'coins' && (
+            <>
+              {/* Current Balance */}
+              <div style={{
+                gridColumn: '1 / -1',
+                background: 'rgba(255, 215, 0, 0.1)',
+                border: '1px solid rgba(255, 215, 0, 0.3)',
+                borderRadius: '16px',
+                padding: '20px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '30px',
+                flexWrap: 'wrap'
+              }}>
+                <div style={{ textAlign: 'center' }}>
+                  <span style={{ fontSize: '40px' }}>🪙</span>
+                  <p style={{ color: 'gold', fontSize: '28px', fontWeight: 'bold', margin: '5px 0' }}>{consumables.coins}</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>Coins</p>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <span style={{ fontSize: '40px' }}>💡</span>
+                  <p style={{ color: '#00bfff', fontSize: '28px', fontWeight: 'bold', margin: '5px 0' }}>{consumables.hints}</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>Hints</p>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <span style={{ fontSize: '40px' }}>↩️</span>
+                  <p style={{ color: 'var(--color-violet)', fontSize: '28px', fontWeight: 'bold', margin: '5px 0' }}>{consumables.undos}</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>Undos</p>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <span style={{ fontSize: '40px' }}>🛡️</span>
+                  <p style={{ color: '#00ff00', fontSize: '28px', fontWeight: 'bold', margin: '5px 0' }}>{consumables.shields}</p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>Shields</p>
+                </div>
+              </div>
+
+              {/* Coin Packs */}
+              {COIN_PACKS.map((pack, i) => (
+                <CoinPackCard
+                  key={pack.id}
+                  pack={pack}
+                  index={i}
+                  purchasing={purchasing === pack.id}
+                  onPurchase={() => handlePurchase(pack.id)}
+                />
+              ))}
+
+              {/* Consumable Packs */}
+              {CONSUMABLE_PACKS.map((pack, i) => (
+                <ConsumablePackCard
+                  key={pack.id}
+                  pack={pack}
+                  index={i + COIN_PACKS.length}
+                  purchasing={purchasing === pack.id}
+                  onPurchase={() => handlePurchase(pack.id)}
+                />
+              ))}
+            </>
+          )}
+
+          {activeTab === 'spins' && (
+            <>
+              {/* Spin Balance & Play Button */}
+              <div style={{
+                gridColumn: '1 / -1',
+                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(255, 107, 53, 0.2))',
+                border: '1px solid rgba(139, 92, 246, 0.3)',
+                borderRadius: '16px',
+                padding: '30px',
+                textAlign: 'center'
+              }}>
+                <span style={{ fontSize: '60px' }}>🎰</span>
+                <h2 style={{ color: 'var(--text-primary)', margin: '15px 0 5px' }}>Lucky Spin</h2>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '15px' }}>
+                  You have <span style={{ color: 'gold', fontWeight: 'bold' }}>{consumables.spins}</span> spins
+                </p>
+                <motion.button
+                  onClick={() => setShowLuckySpin(true)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{
+                    padding: '15px 40px',
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    background: 'linear-gradient(135deg, #ffd700, #ff8c00)',
+                    border: 'none',
+                    borderRadius: '12px',
+                    color: '#000',
+                    cursor: 'pointer'
+                  }}
+                >
+                  OPEN LUCKY SPIN
+                </motion.button>
+              </div>
+
+              {/* Spin Packs */}
+              {SPIN_PACKS.map((pack, i) => (
+                <SpinPackCard
+                  key={pack.id}
+                  pack={pack}
+                  index={i}
+                  purchasing={purchasing === pack.id}
+                  onPurchase={() => handlePurchase(pack.id)}
+                />
+              ))}
+
+              {/* Odds Disclosure */}
+              <div style={{
+                gridColumn: '1 / -1',
+                background: 'rgba(0, 0, 0, 0.3)',
+                border: '1px solid var(--glass-border)',
+                borderRadius: '12px',
+                padding: '15px 20px',
+                fontSize: '11px',
+                color: 'var(--text-secondary)'
+              }}>
+                <strong style={{ color: 'var(--text-primary)' }}>Reward Probabilities:</strong>
+                <span> Common (50 Coins 30%, 100 Coins 20%) | Uncommon (1 Hint 15%, 3 Hints 10%, 1 Undo 10%) | Rare (Theme Trial 8%, Skin Trial 5%) | Epic (Permanent Theme 1.5%) | Legendary (Permanent Skin 0.4%) | Mythic (500 Coins 0.1%)</span>
+              </div>
+            </>
+          )}
+
           {activeTab === 'themes' && (
             <>
               {Object.values(themes).map((theme, i) => (
@@ -330,6 +476,18 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
 
           {activeTab === 'bundles' && (
             <>
+              {/* Mega Bundles (Consumable) */}
+              {MEGA_BUNDLES.map((bundle, i) => (
+                <MegaBundleCard
+                  key={bundle.id}
+                  bundle={bundle}
+                  index={i}
+                  purchasing={purchasing === bundle.id}
+                  onPurchase={() => handlePurchase(bundle.id)}
+                />
+              ))}
+
+              {/* Durable Bundles */}
               <BundleCard
                 bundle={themeBundle}
                 icon="🎨"
@@ -549,6 +707,20 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
               </motion.button>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Lucky Spin Modal */}
+      <AnimatePresence>
+        {showLuckySpin && (
+          <LuckySpin
+            onClose={() => setShowLuckySpin(false)}
+            onUpdate={() => {
+              updateConsumables();
+              updateOwnedItems();
+              if (onPurchaseComplete) onPurchaseComplete();
+            }}
+          />
         )}
       </AnimatePresence>
 
@@ -1001,6 +1173,316 @@ const BundleCard = ({ bundle, icon, owned, purchasing, onPurchase, gradient }) =
           {purchasing ? 'Processing...' : `$${bundle.price.toFixed(2)}`}
         </motion.button>
       )}
+    </motion.div>
+  );
+};
+
+// Coin Pack Card Component
+const CoinPackCard = ({ pack, index, purchasing, onPurchase }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      whileHover={{ y: -5, scale: 1.02 }}
+      style={{
+        padding: '25px',
+        borderRadius: '16px',
+        background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 140, 0, 0.1))',
+        border: '1px solid rgba(255, 215, 0, 0.3)',
+        backdropFilter: 'blur(10px)',
+        textAlign: 'center'
+      }}
+    >
+      <span style={{ fontSize: '50px' }}>🪙</span>
+      <h3 style={{ margin: '15px 0 5px', color: 'gold', fontSize: '20px' }}>
+        {pack.name}
+      </h3>
+      <p style={{
+        margin: '0 0 5px',
+        color: 'var(--text-primary)',
+        fontSize: '28px',
+        fontWeight: 'bold'
+      }}>
+        {pack.coins.toLocaleString()}
+      </p>
+      {pack.bonus && (
+        <span style={{
+          background: 'rgba(0, 255, 0, 0.2)',
+          color: '#00ff00',
+          padding: '3px 10px',
+          borderRadius: '10px',
+          fontSize: '11px'
+        }}>
+          {pack.bonus}
+        </span>
+      )}
+
+      <motion.button
+        onClick={onPurchase}
+        disabled={purchasing}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        style={{
+          width: '100%',
+          marginTop: '15px',
+          padding: '14px',
+          background: 'linear-gradient(135deg, #ffd700, #ff8c00)',
+          border: 'none',
+          borderRadius: '10px',
+          color: '#000',
+          cursor: purchasing ? 'wait' : 'pointer',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          opacity: purchasing ? 0.7 : 1
+        }}
+      >
+        {purchasing ? 'Processing...' : `$${pack.price.toFixed(2)}`}
+      </motion.button>
+    </motion.div>
+  );
+};
+
+// Spin Pack Card Component
+const SpinPackCard = ({ pack, index, purchasing, onPurchase }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      whileHover={{ y: -5, scale: 1.02 }}
+      style={{
+        padding: '25px',
+        borderRadius: '16px',
+        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(255, 107, 53, 0.15))',
+        border: '1px solid rgba(139, 92, 246, 0.3)',
+        backdropFilter: 'blur(10px)',
+        textAlign: 'center'
+      }}
+    >
+      <span style={{ fontSize: '50px' }}>🎰</span>
+      <h3 style={{ margin: '15px 0 5px', color: 'var(--color-violet)', fontSize: '20px' }}>
+        {pack.name}
+      </h3>
+      <p style={{
+        margin: '0 0 5px',
+        color: 'var(--text-primary)',
+        fontSize: '24px',
+        fontWeight: 'bold'
+      }}>
+        {pack.spins} {pack.spins === 1 ? 'Spin' : 'Spins'}
+      </p>
+      {pack.bonus && (
+        <span style={{
+          background: 'rgba(255, 107, 53, 0.2)',
+          color: '#ff6b35',
+          padding: '3px 10px',
+          borderRadius: '10px',
+          fontSize: '11px'
+        }}>
+          {pack.bonus}
+        </span>
+      )}
+      {pack.coinPrice && (
+        <p style={{ color: 'var(--text-secondary)', fontSize: '12px', marginTop: '5px' }}>
+          or {pack.coinPrice} coins
+        </p>
+      )}
+
+      <motion.button
+        onClick={onPurchase}
+        disabled={purchasing}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        style={{
+          width: '100%',
+          marginTop: '15px',
+          padding: '14px',
+          background: 'linear-gradient(135deg, var(--color-violet), #ff6b35)',
+          border: 'none',
+          borderRadius: '10px',
+          color: '#fff',
+          cursor: purchasing ? 'wait' : 'pointer',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          opacity: purchasing ? 0.7 : 1
+        }}
+      >
+        {purchasing ? 'Processing...' : `$${pack.price.toFixed(2)}`}
+      </motion.button>
+    </motion.div>
+  );
+};
+
+// Consumable Pack Card Component
+const ConsumablePackCard = ({ pack, index, purchasing, onPurchase }) => {
+  const icons = {
+    hints: '💡',
+    undos: '↩️',
+    shields: '🛡️'
+  };
+
+  const colors = {
+    hints: '#00bfff',
+    undos: 'var(--color-violet)',
+    shields: '#00ff00'
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      whileHover={{ y: -5, scale: 1.02 }}
+      style={{
+        padding: '25px',
+        borderRadius: '16px',
+        background: `linear-gradient(135deg, ${colors[pack.type]}15, ${colors[pack.type]}25)`,
+        border: `1px solid ${colors[pack.type]}50`,
+        backdropFilter: 'blur(10px)',
+        textAlign: 'center'
+      }}
+    >
+      <span style={{ fontSize: '40px' }}>{icons[pack.type]}</span>
+      <h3 style={{ margin: '10px 0 5px', color: colors[pack.type], fontSize: '18px' }}>
+        {pack.name}
+      </h3>
+      <p style={{
+        margin: '0',
+        color: 'var(--text-primary)',
+        fontSize: '24px',
+        fontWeight: 'bold'
+      }}>
+        {pack.amount}x
+      </p>
+
+      <motion.button
+        onClick={onPurchase}
+        disabled={purchasing}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        style={{
+          width: '100%',
+          marginTop: '15px',
+          padding: '12px',
+          background: colors[pack.type],
+          border: 'none',
+          borderRadius: '10px',
+          color: '#000',
+          cursor: purchasing ? 'wait' : 'pointer',
+          fontSize: '14px',
+          fontWeight: 'bold',
+          opacity: purchasing ? 0.7 : 1
+        }}
+      >
+        {purchasing ? 'Processing...' : `$${pack.price.toFixed(2)}`}
+      </motion.button>
+    </motion.div>
+  );
+};
+
+// Mega Bundle Card Component
+const MegaBundleCard = ({ bundle, index, purchasing, onPurchase }) => {
+  const icons = ['🚀', '⚡', '👑'];
+  const colors = ['#00bfff', '#ffd700', '#ff6b35'];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      whileHover={{ y: -5, scale: 1.02 }}
+      style={{
+        padding: '25px',
+        borderRadius: '16px',
+        background: `linear-gradient(135deg, ${colors[index]}20, ${colors[index]}10)`,
+        border: `2px solid ${colors[index]}50`,
+        backdropFilter: 'blur(10px)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+    >
+      {index === 2 && (
+        <div style={{
+          position: 'absolute',
+          top: '10px',
+          right: '-30px',
+          background: 'gold',
+          color: '#000',
+          padding: '3px 40px',
+          fontSize: '10px',
+          fontWeight: 'bold',
+          transform: 'rotate(45deg)'
+        }}>
+          BEST VALUE
+        </div>
+      )}
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' }}>
+        <span style={{ fontSize: '40px' }}>{icons[index]}</span>
+        <div>
+          <h3 style={{ margin: 0, color: colors[index], fontSize: '20px' }}>
+            {bundle.name}
+          </h3>
+          <p style={{ margin: '5px 0 0', color: 'var(--text-secondary)', fontSize: '12px' }}>
+            {bundle.description}
+          </p>
+        </div>
+      </div>
+
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '8px',
+        marginBottom: '15px'
+      }}>
+        {bundle.contents.coins && (
+          <span style={{ background: 'rgba(255,215,0,0.2)', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', color: 'gold' }}>
+            🪙 {bundle.contents.coins}
+          </span>
+        )}
+        {bundle.contents.hints && (
+          <span style={{ background: 'rgba(0,191,255,0.2)', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', color: '#00bfff' }}>
+            💡 {bundle.contents.hints}
+          </span>
+        )}
+        {bundle.contents.undos && (
+          <span style={{ background: 'rgba(139,92,246,0.2)', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', color: 'var(--color-violet)' }}>
+            ↩️ {bundle.contents.undos}
+          </span>
+        )}
+        {bundle.contents.spins && (
+          <span style={{ background: 'rgba(255,107,53,0.2)', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', color: '#ff6b35' }}>
+            🎰 {bundle.contents.spins}
+          </span>
+        )}
+        {bundle.contents.shields && (
+          <span style={{ background: 'rgba(0,255,0,0.2)', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', color: '#00ff00' }}>
+            🛡️ {bundle.contents.shields}
+          </span>
+        )}
+      </div>
+
+      <motion.button
+        onClick={onPurchase}
+        disabled={purchasing}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
+        style={{
+          width: '100%',
+          padding: '14px',
+          background: `linear-gradient(135deg, ${colors[index]}, ${colors[(index + 1) % 3]})`,
+          border: 'none',
+          borderRadius: '10px',
+          color: '#000',
+          cursor: purchasing ? 'wait' : 'pointer',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          opacity: purchasing ? 0.7 : 1
+        }}
+      >
+        {purchasing ? 'Processing...' : `$${bundle.price.toFixed(2)}`}
+      </motion.button>
     </motion.div>
   );
 };

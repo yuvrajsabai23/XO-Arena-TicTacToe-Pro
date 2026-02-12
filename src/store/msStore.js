@@ -5,6 +5,7 @@ import { unlockItem, unlockBundle, premiumBundle } from './purchases';
 import { themeBundle } from '../themes/themes';
 import { skinBundle } from '../themes/skins';
 import { difficultyPack } from '../logic/minimax';
+import { applyPackPurchase } from './coinManager';
 
 // Check if running in Microsoft Store context
 export const isStoreAvailable = () => {
@@ -76,6 +77,110 @@ export const STORE_PRODUCTS = {
     id: 'premium_bundle',
     storeId: '9XXXXXXXXXXB',
     includes: premiumBundle.includes
+  },
+
+  // ============ CONSUMABLE PRODUCTS ============
+
+  // Coin Packs (Consumable)
+  coins_500: {
+    type: 'consumable',
+    id: 'coins_500',
+    storeId: '9XXXXXXXXXC1',
+    consumableType: 'coins'
+  },
+  coins_1200: {
+    type: 'consumable',
+    id: 'coins_1200',
+    storeId: '9XXXXXXXXXC2',
+    consumableType: 'coins'
+  },
+  coins_2500: {
+    type: 'consumable',
+    id: 'coins_2500',
+    storeId: '9XXXXXXXXXC3',
+    consumableType: 'coins'
+  },
+  coins_5000: {
+    type: 'consumable',
+    id: 'coins_5000',
+    storeId: '9XXXXXXXXXC4',
+    consumableType: 'coins'
+  },
+
+  // Spin Packs (Consumable)
+  spin_1: {
+    type: 'consumable',
+    id: 'spin_1',
+    storeId: '9XXXXXXXXXS1',
+    consumableType: 'spins'
+  },
+  spin_10: {
+    type: 'consumable',
+    id: 'spin_10',
+    storeId: '9XXXXXXXXXS2',
+    consumableType: 'spins'
+  },
+  spin_25: {
+    type: 'consumable',
+    id: 'spin_25',
+    storeId: '9XXXXXXXXXS3',
+    consumableType: 'spins'
+  },
+
+  // Hint Packs (Consumable)
+  hint_pack_10: {
+    type: 'consumable',
+    id: 'hint_pack_10',
+    storeId: '9XXXXXXXXXH1',
+    consumableType: 'hints'
+  },
+  hint_pack_30: {
+    type: 'consumable',
+    id: 'hint_pack_30',
+    storeId: '9XXXXXXXXXH2',
+    consumableType: 'hints'
+  },
+
+  // Undo Packs (Consumable)
+  undo_pack_10: {
+    type: 'consumable',
+    id: 'undo_pack_10',
+    storeId: '9XXXXXXXXXU1',
+    consumableType: 'undos'
+  },
+  undo_pack_30: {
+    type: 'consumable',
+    id: 'undo_pack_30',
+    storeId: '9XXXXXXXXXU2',
+    consumableType: 'undos'
+  },
+
+  // Shield Packs (Consumable)
+  shield_pack_5: {
+    type: 'consumable',
+    id: 'shield_pack_5',
+    storeId: '9XXXXXXXXXSH1',
+    consumableType: 'shields'
+  },
+
+  // Mega Bundles (Consumable)
+  mega_starter: {
+    type: 'consumable',
+    id: 'mega_starter',
+    storeId: '9XXXXXXXXXM1',
+    consumableType: 'mega_bundle'
+  },
+  mega_pro: {
+    type: 'consumable',
+    id: 'mega_pro',
+    storeId: '9XXXXXXXXXM2',
+    consumableType: 'mega_bundle'
+  },
+  mega_legend: {
+    type: 'consumable',
+    id: 'mega_legend',
+    storeId: '9XXXXXXXXXM3',
+    consumableType: 'mega_bundle'
   }
 };
 
@@ -134,6 +239,9 @@ const applyPurchase = (productKey) => {
     unlockItem('themes', product.id);
   } else if (product.type === 'skin') {
     unlockItem('skins', product.id);
+  } else if (product.type === 'consumable') {
+    // Apply consumable pack (coins, spins, hints, undos, shields, mega bundles)
+    applyPackPurchase(product.id);
   }
 };
 
@@ -148,6 +256,9 @@ const simulatePurchase = (productKey) => {
     unlockItem('themes', product.id);
   } else if (product.type === 'skin') {
     unlockItem('skins', product.id);
+  } else if (product.type === 'consumable') {
+    // Apply consumable pack
+    applyPackPurchase(product.id);
   }
 
   return { success: true, status: PurchaseStatus.SUCCEEDED, simulated: true };
@@ -200,7 +311,7 @@ export const getProductInfo = async (productKeys) => {
 
   try {
     const storeIds = productKeys.map(key => STORE_PRODUCTS[key].storeId);
-    const products = await context.getStoreProductsAsync(['Durable'], storeIds);
+    const products = await context.getStoreProductsAsync(['Durable', 'Consumable'], storeIds);
 
     return productKeys.map(key => {
       const storeId = STORE_PRODUCTS[key].storeId;
@@ -227,6 +338,7 @@ export const getProductInfo = async (productKeys) => {
 // Default prices for when Store is not available
 const getDefaultPrice = (productKey) => {
   const prices = {
+    // Durable products
     theme_neon: '$2.99',
     theme_ocean: '$2.99',
     theme_sunset: '$2.99',
@@ -237,7 +349,23 @@ const getDefaultPrice = (productKey) => {
     skin_pixel: '$3.99',
     skin_bundle: '$8.99',
     difficulty_pack: '$4.99',
-    premium_bundle: '$19.99'
+    premium_bundle: '$19.99',
+    // Consumable products
+    coins_500: '$4.99',
+    coins_1200: '$9.99',
+    coins_2500: '$14.99',
+    coins_5000: '$19.99',
+    spin_1: '$1.99',
+    spin_10: '$9.99',
+    spin_25: '$19.99',
+    hint_pack_10: '$2.99',
+    hint_pack_30: '$6.99',
+    undo_pack_10: '$1.99',
+    undo_pack_30: '$4.99',
+    shield_pack_5: '$3.99',
+    mega_starter: '$9.99',
+    mega_pro: '$14.99',
+    mega_legend: '$19.99'
   };
   return prices[productKey] || '$0.99';
 };
