@@ -3,7 +3,27 @@
     "allow": [
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(where:*)",
+      "Bash(winget search:*)",
+      "Bash(npx @pwabuilder/cli package:*)",
+      "Bash(find:*)",
+      "Bash(npm install:*)",
+      "Bash(ls:*)",
+      "Bash(\"/c/Program Files \\(x86\\)/Windows Kits/10/App Certification Kit/makeappx.exe\" pack /d \"c:\\\\Users\\\\vijay\\\\Desktop\\\\XO Arena\\\\msix-manual\" /p \"c:\\\\Users\\\\vijay\\\\Desktop\\\\XO Arena\\\\XOArena.msix\" /l)",
+      "Bash(\"/c/Program Files \\(x86\\)/Windows Kits/10/App Certification Kit/makeappx.exe\" pack /d msix-manual /p XOArena.msix /l /o)",
+      "Bash(powershell.exe:*)",
+      "Bash(export PATH=\"/c/Program Files \\(x86\\)/Windows Kits/10/App Certification Kit:$PATH\")",
+      "Bash(npm run:*)",
+      "Bash(tee:*)",
+      "Bash(test:*)",
+      "Bash(du:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(git push:*)",
+      "Bash(findstr:*)",
+      "WebFetch(domain:xo-arena-tic-tac-toe-pro.vercel.app)",
+      "Bash(powershell -Command \"\\(Invoke-WebRequest -Uri ''https://raw.githubusercontent.com/yuvrajsabai23/XO-Arena-TicTacToe-Pro/main/public/manifest.json'' -UseBasicParsing\\).Content\")",
+      "Bash(powershell -Command \"\\(Invoke-WebRequest -Uri ''https://xo-arena-tic-tac-toe-pro.vercel.app/manifest.json'' -UseBasicParsing -Headers @{''Cache-Control''=''no-cache''}\\).Content\")"
     ]
   }
 }
