@@ -425,7 +425,6 @@ export const getTrialTimeRemaining = (type, itemId) => {
 export const COIN_PACKS = [
   { id: 'coins_500', name: 'Starter Coins', coins: 500, price: 4.99, bonus: null, storeId: 'coins_500' },
   { id: 'coins_1200', name: 'Pro Coins', coins: 1200, price: 9.99, bonus: '+20%', storeId: 'coins_1200' },
-  { id: 'coins_2500', name: 'Elite Coins', coins: 2500, price: 14.99, bonus: '+67%', storeId: 'coins_2500' },
   { id: 'coins_5000', name: 'Legend Coins', coins: 5000, price: 19.99, bonus: '+150%', storeId: 'coins_5000' }
 ];
 
@@ -472,6 +471,15 @@ export const MEGA_BUNDLES = [
 
 // Apply pack purchase
 export const applyPackPurchase = (packId) => {
+  // Handle bonus coins (e.g. from premium bundle)
+  if (packId.startsWith('bonus_coins_')) {
+    const amount = parseInt(packId.replace('bonus_coins_', ''), 10);
+    if (amount > 0) {
+      addCoins(amount);
+      return { success: true, type: 'coins', amount };
+    }
+  }
+
   // Check coin packs
   const coinPack = COIN_PACKS.find(p => p.id === packId);
   if (coinPack) {

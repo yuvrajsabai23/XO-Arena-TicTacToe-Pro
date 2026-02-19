@@ -2,11 +2,67 @@ import { motion } from 'framer-motion';
 import { difficultyConfig, DIFFICULTY } from '../logic/minimax';
 import { isItemOwned } from '../store/purchases';
 
+// Premium easing
+const premiumEase = [0.22, 1, 0.36, 1];
+
+// Container animation
+const containerVariants = {
+  initial: { opacity: 0 },
+  animate: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.15
+    }
+  },
+  exit: {
+    opacity: 0,
+    y: -20,
+    transition: { duration: 0.3 }
+  }
+};
+
+// Item animation
+const itemVariants = {
+  initial: { opacity: 0, y: 25, scale: 0.9 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.5, ease: premiumEase }
+  }
+};
+
+// Card animation
+const cardVariants = {
+  initial: { opacity: 0, y: 30, scale: 0.85, rotateX: 20 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    rotateX: 0,
+    transition: { duration: 0.5, ease: premiumEase }
+  },
+  hover: {
+    scale: 1.05,
+    y: -8,
+    transition: { duration: 0.25, ease: premiumEase }
+  },
+  tap: { scale: 0.97 }
+};
+
+// Difficulty colors
+const difficultyColors = {
+  rookie: { primary: '#00ff00', glow: 'rgba(0, 255, 0, 0.3)' },
+  pro: { primary: '#00bfff', glow: 'rgba(0, 191, 255, 0.3)' },
+  grandmaster: { primary: '#8b5cf6', glow: 'rgba(139, 92, 246, 0.3)' },
+  chaos: { primary: '#ff6b35', glow: 'rgba(255, 107, 53, 0.3)' }
+};
+
 const DifficultySelector = ({ selectedDifficulty, onSelect, onBack }) => {
   const difficulties = Object.values(difficultyConfig);
 
   const handleSelect = (diffId) => {
-    // Check if owned or free
     if (difficultyConfig[diffId].free || isItemOwned('difficulties', diffId)) {
       onSelect(diffId);
     }
@@ -18,70 +74,109 @@ const DifficultySelector = ({ selectedDifficulty, onSelect, onBack }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
+      variants={containerVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
       style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '20px',
+        gap: '25px',
         padding: '20px'
       }}
     >
-      <h2 style={{
-        color: 'var(--text-primary)',
-        fontSize: '20px',
-        margin: 0,
-        letterSpacing: '2px'
-      }}>
+      <motion.h2
+        variants={itemVariants}
+        style={{
+          color: 'var(--text-primary)',
+          fontSize: '22px',
+          margin: 0,
+          letterSpacing: '3px',
+          textShadow: '0 0 30px rgba(6, 182, 212, 0.3)'
+        }}
+      >
         SELECT DIFFICULTY
-      </h2>
+      </motion.h2>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '15px',
-        width: '100%',
-        maxWidth: '400px'
-      }}>
-        {difficulties.map(diff => {
+      <motion.div
+        variants={itemVariants}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '18px',
+          width: '100%',
+          maxWidth: '420px'
+        }}
+      >
+        {difficulties.map((diff, index) => {
           const owned = isOwned(diff.id);
           const selected = selectedDifficulty === diff.id;
+          const colors = difficultyColors[diff.id];
 
           return (
             <motion.button
               key={diff.id}
+              variants={cardVariants}
+              custom={index}
+              initial="initial"
+              animate="animate"
+              whileHover={owned ? "hover" : undefined}
+              whileTap={owned ? "tap" : undefined}
               onClick={() => handleSelect(diff.id)}
-              whileHover={owned ? { scale: 1.05 } : {}}
-              whileTap={owned ? { scale: 0.95 } : {}}
               className="glass-panel"
               style={{
-                padding: '15px',
+                padding: '20px 15px',
                 border: selected
-                  ? '2px solid var(--color-accent)'
+                  ? `2px solid ${colors.primary}`
                   : '1px solid var(--glass-border)',
-                borderRadius: '12px',
-                background: owned ? 'var(--bg-panel)' : 'rgba(0,0,0,0.3)',
+                borderRadius: '16px',
+                background: owned
+                  ? `linear-gradient(145deg, ${colors.primary}15, rgba(15, 23, 42, 0.9))`
+                  : 'rgba(0,0,0,0.4)',
                 cursor: owned ? 'pointer' : 'not-allowed',
-                opacity: owned ? 1 : 0.5,
+                opacity: owned ? 1 : 0.6,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '10px',
+                position: 'relative',
+                overflow: 'hidden',
+                boxShadow: selected
+                  ? `0 0 25px ${colors.glow}, inset 0 1px 0 rgba(255,255,255,0.1)`
+                  : '0 4px 20px rgba(0,0,0,0.3)'
               }}
             >
-              <span style={{ fontSize: '28px' }}>
+              {/* Glow effect */}
+              {selected && (
+                <motion.div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: `radial-gradient(circle at 50% 0%, ${colors.primary}20, transparent 70%)`,
+                    pointerEvents: 'none'
+                  }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                />
+              )}
+
+              <motion.span
+                style={{ fontSize: '32px' }}
+                animate={selected ? { scale: [1, 1.15, 1], rotate: [0, 5, -5, 0] } : {}}
+                transition={{ duration: 1.5, repeat: selected ? Infinity : 0 }}
+              >
                 {diff.id === 'rookie' && '🎮'}
                 {diff.id === 'pro' && '🎯'}
                 {diff.id === 'grandmaster' && '🧠'}
                 {diff.id === 'chaos' && '🎲'}
-              </span>
+              </motion.span>
 
               <span style={{
-                color: 'var(--text-primary)',
-                fontSize: '14px',
-                fontWeight: 'bold'
+                color: owned ? colors.primary : 'var(--text-secondary)',
+                fontSize: '15px',
+                fontWeight: 'bold',
+                textShadow: selected ? `0 0 15px ${colors.glow}` : 'none'
               }}>
                 {diff.name}
               </span>
@@ -89,50 +184,74 @@ const DifficultySelector = ({ selectedDifficulty, onSelect, onBack }) => {
               <span style={{
                 color: 'var(--text-secondary)',
                 fontSize: '11px',
-                textAlign: 'center'
+                textAlign: 'center',
+                lineHeight: 1.4
               }}>
                 {diff.description}
               </span>
 
               {!owned && (
-                <span style={{
-                  color: 'gold',
-                  fontSize: '10px',
-                  marginTop: '5px'
-                }}>
+                <motion.span
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  style={{
+                    color: 'gold',
+                    fontSize: '11px',
+                    marginTop: '5px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
                   🔒 Premium
-                </span>
+                </motion.span>
               )}
 
               {selected && owned && (
-                <span style={{
-                  color: 'var(--color-accent)',
-                  fontSize: '10px'
-                }}>
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  style={{
+                    color: colors.primary,
+                    fontSize: '11px',
+                    fontWeight: 'bold'
+                  }}
+                >
                   ✓ Selected
-                </span>
+                </motion.span>
               )}
             </motion.button>
           );
         })}
-      </div>
+      </motion.div>
 
       <motion.button
+        variants={itemVariants}
         onClick={onBack}
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.05, x: -5 }}
         whileTap={{ scale: 0.95 }}
         style={{
-          background: 'transparent',
+          background: 'rgba(255, 255, 255, 0.05)',
           border: '1px solid var(--glass-border)',
           color: 'var(--text-secondary)',
-          padding: '10px 30px',
-          borderRadius: '8px',
+          padding: '12px 32px',
+          borderRadius: '12px',
           cursor: 'pointer',
-          fontSize: '12px',
-          marginTop: '10px'
+          fontSize: '13px',
+          marginTop: '10px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          backdropFilter: 'blur(10px)'
         }}
       >
-        ← Back
+        <motion.span
+          animate={{ x: [0, -3, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        >
+          ←
+        </motion.span>
+        Back
       </motion.button>
     </motion.div>
   );

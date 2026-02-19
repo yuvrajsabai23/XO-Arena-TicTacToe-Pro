@@ -37,29 +37,29 @@ const getStoreContext = async () => {
 // Product ID mapping
 export const STORE_PRODUCTS = {
   // Individual themes
-  theme_neon: { type: 'theme', id: 'neon', storeId: '9XXXXXXXX1' },
-  theme_ocean: { type: 'theme', id: 'ocean', storeId: '9XXXXXXXX2' },
-  theme_sunset: { type: 'theme', id: 'sunset', storeId: '9XXXXXXXX3' },
-  theme_minimal: { type: 'theme', id: 'minimal', storeId: '9XXXXXXXX4' },
+  theme_neon: { type: 'theme', id: 'neon', storeId: '9PKNR3FTNQZ6' },
+  theme_ocean: { type: 'theme', id: 'ocean', storeId: '9NSMS051S6HK' },
+  theme_sunset: { type: 'theme', id: 'sunset', storeId: '9P0DPF5DT9HT' },
+  theme_minimal: { type: 'theme', id: 'minimal', storeId: '9NT4VR9L88FS' },
 
   // Theme bundle
   theme_bundle: {
     type: 'bundle',
     id: 'theme_bundle',
-    storeId: '9XXXXXXXX5',
+    storeId: '9P4GZ5THGZHZ',
     includes: { themes: ['neon', 'ocean', 'sunset', 'minimal'] }
   },
 
   // Individual skins
-  skin_flame: { type: 'skin', id: 'flame', storeId: '9XXXXXXXX6' },
-  skin_galaxy: { type: 'skin', id: 'galaxy', storeId: '9XXXXXXXX7' },
-  skin_pixel: { type: 'skin', id: 'pixel', storeId: '9XXXXXXXX8' },
+  skin_flame: { type: 'skin', id: 'flame', storeId: '9MVF8JWLQWJJ' },
+  skin_galaxy: { type: 'skin', id: 'galaxy', storeId: '9NT8MPZGW9GP' },
+  skin_pixel: { type: 'skin', id: 'pixel', storeId: '9P0RL4231WVN' },
 
   // Skin bundle
   skin_bundle: {
     type: 'bundle',
     id: 'skin_bundle',
-    storeId: '9XXXXXXXX9',
+    storeId: '9PN0NZNQ68N0',
     includes: { skins: ['flame', 'galaxy', 'pixel'] }
   },
 
@@ -67,16 +67,17 @@ export const STORE_PRODUCTS = {
   difficulty_pack: {
     type: 'bundle',
     id: 'difficulty_pack',
-    storeId: '9XXXXXXXXXXA',
+    storeId: '9MW5144H1LWR',
     includes: { difficulties: ['rookie', 'pro', 'chaos'] }
   },
 
-  // Premium bundle (everything)
+  // Premium bundle (everything + bonus coins)
   premium_bundle: {
     type: 'bundle',
     id: 'premium_bundle',
-    storeId: '9XXXXXXXXXXB',
-    includes: premiumBundle.includes
+    storeId: '9PMZP7FJRG7T',
+    includes: premiumBundle.includes,
+    bonusCoins: 1000
   },
 
   // ============ CONSUMABLE PRODUCTS ============
@@ -85,25 +86,19 @@ export const STORE_PRODUCTS = {
   coins_500: {
     type: 'consumable',
     id: 'coins_500',
-    storeId: '9XXXXXXXXXC1',
+    storeId: '9MSPP2PW6FKJ',
     consumableType: 'coins'
   },
   coins_1200: {
     type: 'consumable',
     id: 'coins_1200',
-    storeId: '9XXXXXXXXXC2',
-    consumableType: 'coins'
-  },
-  coins_2500: {
-    type: 'consumable',
-    id: 'coins_2500',
-    storeId: '9XXXXXXXXXC3',
+    storeId: '9N2HSKV4VDMM',
     consumableType: 'coins'
   },
   coins_5000: {
     type: 'consumable',
     id: 'coins_5000',
-    storeId: '9XXXXXXXXXC4',
+    storeId: '9PN5MZ0MCDMJ',
     consumableType: 'coins'
   },
 
@@ -111,19 +106,19 @@ export const STORE_PRODUCTS = {
   spin_1: {
     type: 'consumable',
     id: 'spin_1',
-    storeId: '9XXXXXXXXXS1',
+    storeId: '9PBMS0SHK40D',
     consumableType: 'spins'
   },
   spin_10: {
     type: 'consumable',
     id: 'spin_10',
-    storeId: '9XXXXXXXXXS2',
+    storeId: '9NCTM0NH3394',
     consumableType: 'spins'
   },
   spin_25: {
     type: 'consumable',
     id: 'spin_25',
-    storeId: '9XXXXXXXXXS3',
+    storeId: '9NPPN71H1ZXT',
     consumableType: 'spins'
   },
 
@@ -131,13 +126,13 @@ export const STORE_PRODUCTS = {
   hint_pack_10: {
     type: 'consumable',
     id: 'hint_pack_10',
-    storeId: '9XXXXXXXXXH1',
+    storeId: '9PLGMHGN42P7',
     consumableType: 'hints'
   },
   hint_pack_30: {
     type: 'consumable',
     id: 'hint_pack_30',
-    storeId: '9XXXXXXXXXH2',
+    storeId: '9NRPGWSDMWKC',
     consumableType: 'hints'
   },
 
@@ -145,13 +140,13 @@ export const STORE_PRODUCTS = {
   undo_pack_10: {
     type: 'consumable',
     id: 'undo_pack_10',
-    storeId: '9XXXXXXXXXU1',
+    storeId: '9PDKBRTZ7VS8',
     consumableType: 'undos'
   },
   undo_pack_30: {
     type: 'consumable',
     id: 'undo_pack_30',
-    storeId: '9XXXXXXXXXU2',
+    storeId: '9P1PNKDVTZWK',
     consumableType: 'undos'
   },
 
@@ -159,7 +154,7 @@ export const STORE_PRODUCTS = {
   shield_pack_5: {
     type: 'consumable',
     id: 'shield_pack_5',
-    storeId: '9XXXXXXXXXSH1',
+    storeId: '9P8ZDKH8M1H2',
     consumableType: 'shields'
   },
 
@@ -167,19 +162,19 @@ export const STORE_PRODUCTS = {
   mega_starter: {
     type: 'consumable',
     id: 'mega_starter',
-    storeId: '9XXXXXXXXXM1',
+    storeId: '9MZ96Z4WCMFD',
     consumableType: 'mega_bundle'
   },
   mega_pro: {
     type: 'consumable',
     id: 'mega_pro',
-    storeId: '9XXXXXXXXXM2',
+    storeId: '9N72BR86DGHW',
     consumableType: 'mega_bundle'
   },
   mega_legend: {
     type: 'consumable',
     id: 'mega_legend',
-    storeId: '9XXXXXXXXXM3',
+    storeId: '9MSP9WXP1GKP',
     consumableType: 'mega_bundle'
   }
 };
@@ -235,6 +230,10 @@ const applyPurchase = (productKey) => {
 
   if (product.type === 'bundle') {
     unlockBundle(product.id, product.includes);
+    // Premium bundle also includes bonus coins
+    if (product.bonusCoins) {
+      applyPackPurchase(`bonus_coins_${product.bonusCoins}`);
+    }
   } else if (product.type === 'theme') {
     unlockItem('themes', product.id);
   } else if (product.type === 'skin') {
@@ -252,6 +251,9 @@ const simulatePurchase = (productKey) => {
   // In development, just unlock the item
   if (product.type === 'bundle') {
     unlockBundle(product.id, product.includes);
+    if (product.bonusCoins) {
+      applyPackPurchase(`bonus_coins_${product.bonusCoins}`);
+    }
   } else if (product.type === 'theme') {
     unlockItem('themes', product.id);
   } else if (product.type === 'skin') {
@@ -353,7 +355,6 @@ const getDefaultPrice = (productKey) => {
     // Consumable products
     coins_500: '$4.99',
     coins_1200: '$9.99',
-    coins_2500: '$14.99',
     coins_5000: '$19.99',
     spin_1: '$1.99',
     spin_10: '$9.99',

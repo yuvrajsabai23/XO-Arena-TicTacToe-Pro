@@ -28,6 +28,29 @@ const APP_STATE = {
   STORE: 'STORE',
 };
 
+// Premium screen transition variants
+const screenTransition = {
+  initial: { opacity: 0, scale: 0.96, filter: 'blur(10px)' },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    filter: 'blur(0px)',
+    transition: {
+      duration: 0.4,
+      ease: [0.22, 1, 0.36, 1]
+    }
+  },
+  exit: {
+    opacity: 0,
+    scale: 1.02,
+    filter: 'blur(8px)',
+    transition: {
+      duration: 0.3,
+      ease: [0.22, 1, 0.36, 1]
+    }
+  }
+};
+
 import ModeSelection from './components/ModeSelection';
 
 const App = () => {
@@ -343,41 +366,94 @@ const App = () => {
 
   // --- RENDER HELPERS ---
 
-  if (appState === APP_STATE.HOME) {
-    return (
-      <>
-        <StartScreen
-          onStart={handleStart}
-          onHowToPlay={() => setShowHowToPlay(true)}
-          onStore={handleStore}
-        />
-        {showHowToPlay && <HowToPlay onClose={() => setShowHowToPlay(false)} />}
-      </>
-    );
-  }
+  // Wrap all screens in AnimatePresence for smooth transitions
+  const renderScreen = () => {
+    switch (appState) {
+      case APP_STATE.HOME:
+        return (
+          <motion.div
+            key="home"
+            variants={screenTransition}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{ height: '100%' }}
+          >
+            <StartScreen
+              onStart={handleStart}
+              onHowToPlay={() => setShowHowToPlay(true)}
+              onStore={handleStore}
+            />
+            <AnimatePresence>
+              {showHowToPlay && <HowToPlay onClose={() => setShowHowToPlay(false)} />}
+            </AnimatePresence>
+          </motion.div>
+        );
 
-  if (appState === APP_STATE.MODE_SELECT) {
-    return <ModeSelection onSelect={selectMode} onBack={handleHome} />;
-  }
+      case APP_STATE.MODE_SELECT:
+        return (
+          <motion.div
+            key="mode-select"
+            variants={screenTransition}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{ height: '100%' }}
+          >
+            <ModeSelection onSelect={selectMode} onBack={handleHome} />
+          </motion.div>
+        );
 
-  if (appState === APP_STATE.DIFFICULTY_SELECT) {
-    return (
-      <div className="flex-center" style={{ height: '100vh' }}>
-        <DifficultySelector
-          selectedDifficulty={currentDifficulty}
-          onSelect={selectDifficulty}
-          onBack={() => setAppState(APP_STATE.MODE_SELECT)}
-        />
-      </div>
-    );
-  }
+      case APP_STATE.DIFFICULTY_SELECT:
+        return (
+          <motion.div
+            key="difficulty-select"
+            variants={screenTransition}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="flex-center"
+            style={{ height: '100vh' }}
+          >
+            <DifficultySelector
+              selectedDifficulty={currentDifficulty}
+              onSelect={selectDifficulty}
+              onBack={() => setAppState(APP_STATE.MODE_SELECT)}
+            />
+          </motion.div>
+        );
 
-  if (appState === APP_STATE.STORE) {
+      case APP_STATE.STORE:
+        return (
+          <motion.div
+            key="store"
+            variants={screenTransition}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{ height: '100%' }}
+          >
+            <StoreScreen
+              onBack={handleHome}
+              onPurchaseComplete={handlePurchaseComplete}
+            />
+          </motion.div>
+        );
+
+      case APP_STATE.GAME:
+        return null; // Game is rendered separately below
+
+      default:
+        return null;
+    }
+  };
+
+  // If not in GAME state, render the screen with transitions
+  if (appState !== APP_STATE.GAME) {
     return (
-      <StoreScreen
-        onBack={handleHome}
-        onPurchaseComplete={handlePurchaseComplete}
-      />
+      <AnimatePresence mode="wait">
+        {renderScreen()}
+      </AnimatePresence>
     );
   }
 
