@@ -59,36 +59,36 @@
 
 | Product ID | Store ID | Title | Price | Status |
 |------------|----------|-------|-------|--------|
-| `theme_neon` | `9PKNR3FTNQZ6` | Neon Theme Pack | $2.99 | Published |
-| `theme_ocean` | `9NSMS051S6HK` | Ocean Theme Pack | $2.99 | Published |
-| `theme_sunset` | `9P0DPF5DT9HT` | Sunset Theme Pack | $2.99 | Published |
-| `theme_minimal` | `9NT4VR9L88FS` | Minimal Theme Pack | $2.99 | Published |
-| `theme_bundle` | `9P4GZ5THGZHZ` | All Themes Bundle | $7.99 | Published |
-| `skin_flame` | `9MVF8JWLQWJJ` | Flame & Ice Skin | $3.99 | Published |
-| `skin_galaxy` | `9NT8MPZGW9GP` | Galaxy Skin | $3.99 | Published |
-| `skin_pixel` | `9P0RL4231WVN` | Pixel Retro Skin | $3.99 | Published |
-| `skin_bundle` | `9PN0NZNQ68N0` | All Skins Bundle | $8.99 | Published |
-| `difficulty_pack` | `9MW5144H1LWR` | AI Difficulty Pack | $4.99 | Published |
-| `premium_bundle` | `9PMZP7FJRG7T` | Ultimate Bundle | $19.99 | Published |
+| `theme_neon` | `9PKNR3FTNQZ6` | Neon Theme Pack | $0.99 | Published |
+| `theme_ocean` | `9NSMS051S6HK` | Ocean Theme Pack | $0.99 | Published |
+| `theme_sunset` | `9P0DPF5DT9HT` | Sunset Theme Pack | $0.99 | Published |
+| `theme_minimal` | `9NT4VR9L88FS` | Minimal Theme Pack | $0.99 | Published |
+| `theme_bundle` | `9P4GZ5THGZHZ` | All Themes Bundle | $2.99 | Published |
+| `skin_flame` | `9MVF8JWLQWJJ` | Flame & Ice Skin | $0.99 | Published |
+| `skin_galaxy` | `9NT8MPZGW9GP` | Galaxy Skin | $0.99 | Published |
+| `skin_pixel` | `9P0RL4231WVN` | Pixel Retro Skin | $0.99 | Published |
+| `skin_bundle` | `9PN0NZNQ68N0` | All Skins Bundle | $2.99 | Published |
+| `difficulty_pack` | `9MW5144H1LWR` | AI Difficulty Pack | $1.99 | Published |
+| `premium_bundle` | `9PMZP7FJRG7T` | Ultimate Bundle | $4.99 | Published |
 
 ### CONSUMABLE PRODUCTS (14 - Developer-managed consumable) - ALL PUBLISHED
 
 | Product ID | Store ID | Title | Price | Status |
 |------------|----------|-------|-------|--------|
-| `coins_500` | `9MSPP2PW6FKJ` | 500 Coins | $4.99 | Published |
-| `coins_1200` | `9N2HSKV4VDMM` | 1200 Coins | $9.99 | Published |
-| `coins_5000` | `9PN5MZ0MCDMJ` | 5000 Coins | $19.99 | Published |
-| `spin_1` | `9PBMS0SHK40D` | 1 Lucky Spin | $1.99 | Published |
-| `spin_10` | `9NCTM0NH3394` | 10 Lucky Spins | $9.99 | Published |
-| `spin_25` | `9NPPN71H1ZXT` | 25 Lucky Spins | $19.99 | Published |
-| `hint_pack_10` | `9PLGMHGN42P7` | 10 Hints Pack | $2.99 | Published |
-| `hint_pack_30` | `9NRPGWSDMWKC` | 30 Hints Pack | $6.99 | Published |
-| `undo_pack_10` | `9PDKBRTZ7VS8` | 10 Undos Pack | $1.99 | Published |
-| `undo_pack_30` | `9P1PNKDVTZWK` | 30 Undos Pack | $4.99 | Published |
-| `shield_pack_5` | `9P8ZDKH8M1H2` | 5 Streak Shields | $3.99 | Published |
-| `mega_starter` | `9MZ96Z4WCMFD` | Starter Pack | $9.99 | Published |
-| `mega_pro` | `9N72BR86DGHW` | Pro Pack | $14.99 | Published |
-| `mega_legend` | `9MSP9WXP1GKP` | Legend Pack | $19.99 | Published |
+| `coins_500` | `9MSPP2PW6FKJ` | 500 Coins | $0.99 | Published |
+| `coins_1200` | `9N2HSKV4VDMM` | 1200 Coins | $1.99 | Published |
+| `coins_5000` | `9PN5MZ0MCDMJ` | 5000 Coins | $4.99 | Published |
+| `spin_1` | `9PBMS0SHK40D` | 1 Lucky Spin | $0.99 | Published |
+| `spin_10` | `9NCTM0NH3394` | 10 Lucky Spins | $1.99 | Published |
+| `spin_25` | `9NPPN71H1ZXT` | 25 Lucky Spins | $3.99 | Published |
+| `hint_pack_10` | `9PLGMHGN42P7` | 10 Hints Pack | $0.99 | Published |
+| `hint_pack_30` | `9NRPGWSDMWKC` | 30 Hints Pack | $1.99 | Published |
+| `undo_pack_10` | `9PDKBRTZ7VS8` | 10 Undos Pack | $0.99 | Published |
+| `undo_pack_30` | `9P1PNKDVTZWK` | 30 Undos Pack | $1.99 | Published |
+| `shield_pack_5` | `9P8ZDKH8M1H2` | 5 Streak Shields | $0.99 | Published |
+| `mega_starter` | `9MZ96Z4WCMFD` | Starter Pack | $2.99 | Published |
+| `mega_pro` | `9N72BR86DGHW` | Pro Pack | $4.99 | Published |
+| `mega_legend` | `9MSP9WXP1GKP` | Legend Pack | $6.99 | Published |
 
 ---
 
@@ -155,7 +155,7 @@ theme_neon: { type: 'theme', id: 'neon', storeId: '9NBLGGH4R2R6' },
 
 | Item | Status |
 |------|--------|
-| App published on MS Store | Completed |
+| App published on MS Store (v1.0.1) | Completed |
 | Premium UI animations | Completed |
 | Store screen with tabs | Completed |
 | Coin economy system | Completed |
@@ -165,22 +165,31 @@ theme_neon: { type: 'theme', id: 'neon', storeId: '9NBLGGH4R2R6' },
 | Add-ons certification (25/25) | Completed - Published Feb 19, 2026 |
 | coins_2500 | Removed from app |
 | msStore.js updated with all real Store IDs | Completed - Feb 19, 2026 |
-| Build & push updated code | **TODO** |
-| Submit app update in Partner Center | **TODO** |
-| App update certification | Waiting for submission |
+| All audio/sound disabled | Completed - Feb 19, 2026 |
+| Build & push updated code to GitHub | Completed - Feb 19, 2026 |
+| PWABuilder MSIX generated (v1.0.2) | Completed - Feb 19, 2026 |
+| App update submitted in Partner Center (v1.0.2) | Completed - Submitted Feb 19, 2026 |
+| v1.0.2 rejected — Policy 10.8.7 (prices too high) | Failed - Feb 25, 2026 |
+| Add-on prices lowered (all 25) | Completed - Feb 26, 2026 |
+| App update resubmitted (v1.0.2, same MSIX) | Completed - Feb 26, 2026 |
+| App update certification (resubmission) | **Waiting** - 1-3 business days |
 
 ---
 
-## Timeline Estimate
+## Timeline
 
 | Step | Duration | Status |
 |------|----------|--------|
 | Create all add-ons in Partner Center | 1-2 hours | DONE |
-| Add-ons certification (25/25) | 1-3 business days | DONE |
-| Update msStore.js with all real Store IDs | 30 minutes | DONE |
-| Build & push updated code | 30 minutes | **NEXT** |
-| Submit app update in Partner Center | 1 hour | TODO |
-| App update certification | 1-3 business days | TODO |
+| Add-ons certification (25/25) | 1-3 business days | DONE - Feb 19 |
+| Update msStore.js with all real Store IDs | 30 minutes | DONE - Feb 19 |
+| Build & push updated code | 30 minutes | DONE - Feb 19 |
+| Generate MSIX v1.0.2 via PWABuilder | 15 minutes | DONE - Feb 19 |
+| Submit app update in Partner Center | 15 minutes | DONE - Feb 19 |
+| v1.0.2 certification | 1-3 business days | FAILED - Policy 10.8.7 |
+| Lower all 25 add-on prices | 30 minutes | DONE - Feb 26 |
+| Resubmit app update (v1.0.2) | 10 minutes | DONE - Feb 26 |
+| App update certification (resubmission) | 1-3 business days | **WAITING** |
 
 ---
 
@@ -188,10 +197,14 @@ theme_neon: { type: 'theme', id: 'neon', storeId: '9NBLGGH4R2R6' },
 
 - All 25 add-ons have **real Store IDs** in msStore.js
 - `coins_2500` removed from app (was pending certification)
+- All audio/sound/TTS completely disabled (was causing noise issues)
 - Age rating: ESRB: E, PEGI: 3, IARC: 3 (suitable for all ages)
 - Premium bundle correctly delivers 1,000 bonus coins on purchase
 - Total add-on count: 25 (11 Durable + 14 Consumable)
 - All add-ons submitted Feb 16, 2026; published Feb 19, 2026
+- App update v1.0.2 submitted Feb 19, 2026 (includes Store IDs + audio removal)
+- v1.0.2 rejected Feb 25 — Policy 10.8.7 (add-on prices too high for a tic-tac-toe game)
+- All 25 add-on prices lowered Feb 26 and app update resubmitted
 
 ---
 
@@ -202,4 +215,4 @@ theme_neon: { type: 'theme', id: 'neon', storeId: '9NBLGGH4R2R6' },
 
 ---
 
-*Last updated: February 19, 2026*
+*Last updated: February 26, 2026 (v1.0.2 resubmitted with lowered prices)*
