@@ -454,7 +454,7 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
             zIndex: 1
           }}
         >
-          $19.99
+          $4.99
         </motion.div>
       </motion.div>
 
@@ -1053,9 +1053,9 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
                 zIndex: 1
               }}>
                 {[
-                  { icon: '🎨', label: '4 Themes', value: '$11.96' },
-                  { icon: '✨', label: '3 Skins', value: '$11.97' },
-                  { icon: '🤖', label: '3 AI Modes', value: '$4.99' }
+                  { icon: '🎨', label: '4 Themes', value: '$3.96' },
+                  { icon: '✨', label: '3 Skins', value: '$2.97' },
+                  { icon: '🤖', label: '3 AI Modes', value: '$1.99' }
                 ].map((item, i) => (
                   <motion.div
                     key={item.label}
@@ -1084,14 +1084,14 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
                 zIndex: 1
               }}>
                 <span style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'line-through', fontSize: '20px' }}>
-                  $28.92
+                  $8.92
                 </span>
                 <motion.span
                   style={{ color: 'gold', fontSize: '42px', fontWeight: 'bold' }}
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 >
-                  $19.99
+                  $4.99
                 </motion.span>
                 <span style={{
                   background: 'linear-gradient(135deg, rgba(0,255,0,0.3), rgba(0,200,0,0.2))',
@@ -1101,7 +1101,7 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
                   fontSize: '13px',
                   fontWeight: 'bold'
                 }}>
-                  SAVE 31%
+                  SAVE 44%
                 </span>
               </div>
 

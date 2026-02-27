@@ -33,7 +33,7 @@ export const themes = {
       accent: '#ff00ff'
     },
     storeId: 'theme_neon',
-    price: 2.99
+    price: 0.99
   },
   ocean: {
     id: 'ocean',
@@ -50,7 +50,7 @@ export const themes = {
       accent: '#00d4ff'
     },
     storeId: 'theme_ocean',
-    price: 2.99
+    price: 0.99
   },
   sunset: {
     id: 'sunset',
@@ -67,7 +67,7 @@ export const themes = {
       accent: '#ff6b35'
     },
     storeId: 'theme_sunset',
-    price: 2.99
+    price: 0.99
   },
   minimal: {
     id: 'minimal',
@@ -84,7 +84,7 @@ export const themes = {
       accent: '#000000'
     },
     storeId: 'theme_minimal',
-    price: 2.99
+    price: 0.99
   }
 };
 
@@ -93,7 +93,7 @@ export const themeBundle = {
   name: 'All Themes Bundle',
   description: 'Unlock all 4 premium themes',
   storeId: 'theme_bundle',
-  price: 7.99,
+  price: 2.99,
   includes: ['neon', 'ocean', 'sunset', 'minimal']
 };
 

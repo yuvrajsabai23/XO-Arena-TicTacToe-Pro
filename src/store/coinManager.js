@@ -423,30 +423,30 @@ export const getTrialTimeRemaining = (type, itemId) => {
 // ============ PACK DEFINITIONS ============
 
 export const COIN_PACKS = [
-  { id: 'coins_500', name: 'Starter Coins', coins: 500, price: 4.99, bonus: null, storeId: 'coins_500' },
-  { id: 'coins_1200', name: 'Pro Coins', coins: 1200, price: 9.99, bonus: '+20%', storeId: 'coins_1200' },
-  { id: 'coins_5000', name: 'Legend Coins', coins: 5000, price: 19.99, bonus: '+150%', storeId: 'coins_5000' }
+  { id: 'coins_500', name: 'Starter Coins', coins: 500, price: 0.99, bonus: null, storeId: 'coins_500' },
+  { id: 'coins_1200', name: 'Pro Coins', coins: 1200, price: 1.99, bonus: '+20%', storeId: 'coins_1200' },
+  { id: 'coins_5000', name: 'Legend Coins', coins: 5000, price: 4.99, bonus: '+150%', storeId: 'coins_5000' }
 ];
 
 export const SPIN_PACKS = [
-  { id: 'spin_1', name: '1 Spin', spins: 1, price: 1.99, coinPrice: 200, storeId: 'spin_1' },
-  { id: 'spin_10', name: '10 Spins', spins: 10, price: 9.99, coinPrice: 1500, bonus: '25% off', storeId: 'spin_10' },
-  { id: 'spin_25', name: '25 Spins', spins: 25, price: 19.99, coinPrice: 3000, bonus: '40% off + Guaranteed Rare', storeId: 'spin_25' }
+  { id: 'spin_1', name: '1 Spin', spins: 1, price: 0.99, coinPrice: 200, storeId: 'spin_1' },
+  { id: 'spin_10', name: '10 Spins', spins: 10, price: 1.99, coinPrice: 1500, bonus: '25% off', storeId: 'spin_10' },
+  { id: 'spin_25', name: '25 Spins', spins: 25, price: 3.99, coinPrice: 3000, bonus: '40% off + Guaranteed Rare', storeId: 'spin_25' }
 ];
 
 export const CONSUMABLE_PACKS = [
-  { id: 'hint_pack_10', name: 'Hint Pack', type: 'hints', amount: 10, price: 2.99, storeId: 'hint_pack_10' },
-  { id: 'hint_pack_30', name: 'Hint Bundle', type: 'hints', amount: 30, price: 6.99, storeId: 'hint_pack_30' },
-  { id: 'undo_pack_10', name: 'Undo Pack', type: 'undos', amount: 10, price: 1.99, storeId: 'undo_pack_10' },
-  { id: 'undo_pack_30', name: 'Undo Bundle', type: 'undos', amount: 30, price: 4.99, storeId: 'undo_pack_30' },
-  { id: 'shield_pack_5', name: 'Shield Pack', type: 'shields', amount: 5, price: 3.99, storeId: 'shield_pack_5' }
+  { id: 'hint_pack_10', name: 'Hint Pack', type: 'hints', amount: 10, price: 0.99, storeId: 'hint_pack_10' },
+  { id: 'hint_pack_30', name: 'Hint Bundle', type: 'hints', amount: 30, price: 1.99, storeId: 'hint_pack_30' },
+  { id: 'undo_pack_10', name: 'Undo Pack', type: 'undos', amount: 10, price: 0.99, storeId: 'undo_pack_10' },
+  { id: 'undo_pack_30', name: 'Undo Bundle', type: 'undos', amount: 30, price: 1.99, storeId: 'undo_pack_30' },
+  { id: 'shield_pack_5', name: 'Shield Pack', type: 'shields', amount: 5, price: 0.99, storeId: 'shield_pack_5' }
 ];
 
 export const MEGA_BUNDLES = [
   {
     id: 'mega_starter',
     name: 'Mega Starter',
-    price: 9.99,
+    price: 2.99,
     storeId: 'mega_starter',
     contents: { coins: 1000, hints: 10, undos: 5, spins: 5 },
     description: '1,000 Coins + 10 Hints + 5 Undos + 5 Spins'
@@ -454,7 +454,7 @@ export const MEGA_BUNDLES = [
   {
     id: 'mega_pro',
     name: 'Mega Pro',
-    price: 14.99,
+    price: 4.99,
     storeId: 'mega_pro',
     contents: { coins: 2500, hints: 25, undos: 15, spins: 12 },
     description: '2,500 Coins + 25 Hints + 15 Undos + 12 Spins'
@@ -462,7 +462,7 @@ export const MEGA_BUNDLES = [
   {
     id: 'mega_legend',
     name: 'Mega Legend',
-    price: 19.99,
+    price: 6.99,
     storeId: 'mega_legend',
     contents: { coins: 5000, hints: 50, undos: 30, spins: 25, shields: 2 },
     description: '5,000 Coins + 50 Hints + 30 Undos + 25 Spins + 2 Shields'

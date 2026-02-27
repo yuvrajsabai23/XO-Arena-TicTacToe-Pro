@@ -37,7 +37,7 @@ export const skins = {
       animation: 'shimmer'
     },
     storeId: 'skin_flame',
-    price: 3.99
+    price: 0.99
   },
   galaxy: {
     id: 'galaxy',
@@ -58,7 +58,7 @@ export const skins = {
       animation: 'pulse'
     },
     storeId: 'skin_galaxy',
-    price: 3.99
+    price: 0.99
   },
   pixel: {
     id: 'pixel',
@@ -79,7 +79,7 @@ export const skins = {
       animation: 'none'
     },
     storeId: 'skin_pixel',
-    price: 3.99
+    price: 0.99
   }
 };
 
@@ -88,7 +88,7 @@ export const skinBundle = {
   name: 'All Skins Bundle',
   description: 'Unlock all 3 premium character skins',
   storeId: 'skin_bundle',
-  price: 8.99,
+  price: 2.99,
   includes: ['flame', 'galaxy', 'pixel']
 };
 

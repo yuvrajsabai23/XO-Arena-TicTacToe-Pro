@@ -15,7 +15,7 @@ export const difficultyConfig = {
     description: 'Easy AI - Makes random moves',
     free: false,
     storeId: 'difficulty_pack',
-    price: 4.99
+    price: 1.99
   },
   pro: {
     id: 'pro',
@@ -23,7 +23,7 @@ export const difficultyConfig = {
     description: 'Medium AI - Plays well but makes mistakes',
     free: false,
     storeId: 'difficulty_pack',
-    price: 4.99
+    price: 1.99
   },
   grandmaster: {
     id: 'grandmaster',
@@ -37,7 +37,7 @@ export const difficultyConfig = {
     description: 'Unpredictable AI - Random genius or blunder',
     free: false,
     storeId: 'difficulty_pack',
-    price: 4.99
+    price: 1.99
   }
 };
 
@@ -46,7 +46,7 @@ export const difficultyPack = {
   name: 'AI Difficulty Pack',
   description: 'Unlock Rookie, Pro, and Chaos AI modes',
   storeId: 'difficulty_pack',
-  price: 4.99,
+  price: 1.99,
   includes: ['rookie', 'pro', 'chaos']
 };
 
