@@ -1,65 +1,64 @@
 // Microsoft Store Integration for XO Arena PWA
-// Handles in-app purchases through Windows.Services.Store API
+// Uses Digital Goods API + Payment Request API (the correct approach for PWAs)
+// Docs: https://learn.microsoft.com/en-us/microsoft-edge/progressive-web-apps/how-to/digital-goods-api
 
 import { unlockItem, unlockBundle, premiumBundle } from './purchases';
-import { themeBundle } from '../themes/themes';
-import { skinBundle } from '../themes/skins';
-import { difficultyPack } from '../logic/minimax';
 import { applyPackPurchase } from './coinManager';
 
-// Check if running in Microsoft Store context
+// Digital Goods Service instance
+let digitalGoodsService = null;
+
+// Check if Digital Goods API is available (PWA installed from Microsoft Store)
 export const isStoreAvailable = () => {
-  return typeof window !== 'undefined' &&
-         window.Windows?.Services?.Store?.StoreContext;
+  return 'getDigitalGoodsService' in window;
 };
 
-// Get Store context
-let storeContext = null;
+// Initialize the Digital Goods Service
+const getService = async () => {
+  if (digitalGoodsService) return digitalGoodsService;
 
-const getStoreContext = async () => {
   if (!isStoreAvailable()) {
-    console.log('Microsoft Store not available');
+    console.log('Digital Goods API not available — not installed from Store');
     return null;
   }
 
-  if (!storeContext) {
-    try {
-      storeContext = await window.Windows.Services.Store.StoreContext.getDefault();
-    } catch (e) {
-      console.error('Failed to get store context:', e);
-      return null;
-    }
+  try {
+    digitalGoodsService = await window.getDigitalGoodsService(
+      'https://store.microsoft.com/billing'
+    );
+    return digitalGoodsService;
+  } catch (e) {
+    console.error('Failed to connect to Microsoft Store Billing:', e);
+    return null;
   }
-
-  return storeContext;
 };
 
-// Product ID mapping
+// Product ID mapping — itemId matches Partner Center Product ID (InAppOfferToken)
 export const STORE_PRODUCTS = {
   // Individual themes
-  theme_neon: { type: 'theme', id: 'neon', storeId: '9PKNR3FTNQZ6' },
-  theme_ocean: { type: 'theme', id: 'ocean', storeId: '9NSMS051S6HK' },
-  theme_sunset: { type: 'theme', id: 'sunset', storeId: '9P0DPF5DT9HT' },
-  theme_minimal: { type: 'theme', id: 'minimal', storeId: '9NT4VR9L88FS' },
+  theme_neon: { type: 'theme', id: 'neon', itemId: 'theme_neon' },
+  theme_ocean: { type: 'theme', id: 'ocean', itemId: 'theme_ocean' },
+  theme_sunset: { type: 'theme', id: 'sunset', itemId: 'theme_sunset' },
+  theme_minimal: { type: 'theme', id: 'minimal', itemId: 'theme_minimal' },
 
   // Theme bundle
   theme_bundle: {
     type: 'bundle',
     id: 'theme_bundle',
-    storeId: '9P4GZ5THGZHZ',
+    itemId: 'theme_bundle',
     includes: { themes: ['neon', 'ocean', 'sunset', 'minimal'] }
   },
 
   // Individual skins
-  skin_flame: { type: 'skin', id: 'flame', storeId: '9MVF8JWLQWJJ' },
-  skin_galaxy: { type: 'skin', id: 'galaxy', storeId: '9NT8MPZGW9GP' },
-  skin_pixel: { type: 'skin', id: 'pixel', storeId: '9P0RL4231WVN' },
+  skin_flame: { type: 'skin', id: 'flame', itemId: 'skin_flame' },
+  skin_galaxy: { type: 'skin', id: 'galaxy', itemId: 'skin_galaxy' },
+  skin_pixel: { type: 'skin', id: 'pixel', itemId: 'skin_pixel' },
 
   // Skin bundle
   skin_bundle: {
     type: 'bundle',
     id: 'skin_bundle',
-    storeId: '9PN0NZNQ68N0',
+    itemId: 'skin_bundle',
     includes: { skins: ['flame', 'galaxy', 'pixel'] }
   },
 
@@ -67,7 +66,7 @@ export const STORE_PRODUCTS = {
   difficulty_pack: {
     type: 'bundle',
     id: 'difficulty_pack',
-    storeId: '9MW5144H1LWR',
+    itemId: 'difficulty_pack',
     includes: { difficulties: ['rookie', 'pro', 'chaos'] }
   },
 
@@ -75,108 +74,38 @@ export const STORE_PRODUCTS = {
   premium_bundle: {
     type: 'bundle',
     id: 'premium_bundle',
-    storeId: '9PMZP7FJRG7T',
+    itemId: 'premium_bundle',
     includes: premiumBundle.includes,
     bonusCoins: 1000
   },
 
   // ============ CONSUMABLE PRODUCTS ============
 
-  // Coin Packs (Consumable)
-  coins_500: {
-    type: 'consumable',
-    id: 'coins_500',
-    storeId: '9MSPP2PW6FKJ',
-    consumableType: 'coins'
-  },
-  coins_1200: {
-    type: 'consumable',
-    id: 'coins_1200',
-    storeId: '9N2HSKV4VDMM',
-    consumableType: 'coins'
-  },
-  coins_5000: {
-    type: 'consumable',
-    id: 'coins_5000',
-    storeId: '9PN5MZ0MCDMJ',
-    consumableType: 'coins'
-  },
+  // Coin Packs
+  coins_500: { type: 'consumable', id: 'coins_500', itemId: 'coins_500' },
+  coins_1200: { type: 'consumable', id: 'coins_1200', itemId: 'coins_1200' },
+  coins_5000: { type: 'consumable', id: 'coins_5000', itemId: 'coins_5000' },
 
-  // Spin Packs (Consumable)
-  spin_1: {
-    type: 'consumable',
-    id: 'spin_1',
-    storeId: '9PBMS0SHK40D',
-    consumableType: 'spins'
-  },
-  spin_10: {
-    type: 'consumable',
-    id: 'spin_10',
-    storeId: '9NCTM0NH3394',
-    consumableType: 'spins'
-  },
-  spin_25: {
-    type: 'consumable',
-    id: 'spin_25',
-    storeId: '9NPPN71H1ZXT',
-    consumableType: 'spins'
-  },
+  // Spin Packs
+  spin_1: { type: 'consumable', id: 'spin_1', itemId: 'spin_1' },
+  spin_10: { type: 'consumable', id: 'spin_10', itemId: 'spin_10' },
+  spin_25: { type: 'consumable', id: 'spin_25', itemId: 'spin_25' },
 
-  // Hint Packs (Consumable)
-  hint_pack_10: {
-    type: 'consumable',
-    id: 'hint_pack_10',
-    storeId: '9PLGMHGN42P7',
-    consumableType: 'hints'
-  },
-  hint_pack_30: {
-    type: 'consumable',
-    id: 'hint_pack_30',
-    storeId: '9NRPGWSDMWKC',
-    consumableType: 'hints'
-  },
+  // Hint Packs
+  hint_pack_10: { type: 'consumable', id: 'hint_pack_10', itemId: 'hint_pack_10' },
+  hint_pack_30: { type: 'consumable', id: 'hint_pack_30', itemId: 'hint_pack_30' },
 
-  // Undo Packs (Consumable)
-  undo_pack_10: {
-    type: 'consumable',
-    id: 'undo_pack_10',
-    storeId: '9PDKBRTZ7VS8',
-    consumableType: 'undos'
-  },
-  undo_pack_30: {
-    type: 'consumable',
-    id: 'undo_pack_30',
-    storeId: '9P1PNKDVTZWK',
-    consumableType: 'undos'
-  },
+  // Undo Packs
+  undo_pack_10: { type: 'consumable', id: 'undo_pack_10', itemId: 'undo_pack_10' },
+  undo_pack_30: { type: 'consumable', id: 'undo_pack_30', itemId: 'undo_pack_30' },
 
-  // Shield Packs (Consumable)
-  shield_pack_5: {
-    type: 'consumable',
-    id: 'shield_pack_5',
-    storeId: '9P8ZDKH8M1H2',
-    consumableType: 'shields'
-  },
+  // Shield Packs
+  shield_pack_5: { type: 'consumable', id: 'shield_pack_5', itemId: 'shield_pack_5' },
 
-  // Mega Bundles (Consumable)
-  mega_starter: {
-    type: 'consumable',
-    id: 'mega_starter',
-    storeId: '9MZ96Z4WCMFD',
-    consumableType: 'mega_bundle'
-  },
-  mega_pro: {
-    type: 'consumable',
-    id: 'mega_pro',
-    storeId: '9N72BR86DGHW',
-    consumableType: 'mega_bundle'
-  },
-  mega_legend: {
-    type: 'consumable',
-    id: 'mega_legend',
-    storeId: '9MSP9WXP1GKP',
-    consumableType: 'mega_bundle'
-  }
+  // Mega Bundles (consumable)
+  mega_starter: { type: 'consumable', id: 'mega_starter', itemId: 'mega_starter' },
+  mega_pro: { type: 'consumable', id: 'mega_pro', itemId: 'mega_pro' },
+  mega_legend: { type: 'consumable', id: 'mega_legend', itemId: 'mega_legend' }
 };
 
 // Purchase result status
@@ -189,7 +118,7 @@ export const PurchaseStatus = {
   UNKNOWN: 5
 };
 
-// Request purchase of a product
+// Purchase a product using Payment Request API
 export const purchaseProduct = async (productKey) => {
   const product = STORE_PRODUCTS[productKey];
   if (!product) {
@@ -197,27 +126,48 @@ export const purchaseProduct = async (productKey) => {
     return { success: false, status: PurchaseStatus.UNKNOWN };
   }
 
-  const context = await getStoreContext();
-
-  if (!context) {
-    console.warn('Microsoft Store not available — purchase blocked');
+  const service = await getService();
+  if (!service) {
+    console.warn('Store not available — purchase blocked');
     return { success: false, status: PurchaseStatus.SERVER_ERROR };
   }
 
   try {
-    const result = await context.requestPurchaseAsync(product.storeId);
+    // Create a Payment Request for Microsoft Store Billing
+    const request = new PaymentRequest([
+      {
+        supportedMethods: 'https://store.microsoft.com/billing',
+        data: { sku: product.itemId }
+      }
+    ]);
 
-    if (result.status === 0) { // Succeeded
-      // Unlock the purchased item
-      applyPurchase(productKey);
-      return { success: true, status: PurchaseStatus.SUCCEEDED };
-    } else if (result.status === 1) { // Already purchased
-      applyPurchase(productKey);
-      return { success: true, status: PurchaseStatus.ALREADY_PURCHASED };
-    } else {
-      return { success: false, status: result.status };
+    // Show the Store purchase UI
+    const response = await request.show();
+
+    // Payment succeeded — get purchase token
+    const purchaseToken = response.details?.token || response.details?.purchaseToken;
+
+    // Complete the payment
+    await response.complete('success');
+
+    // For consumables, consume the purchase so it can be bought again
+    if (product.type === 'consumable' && purchaseToken) {
+      try {
+        await service.consume(purchaseToken);
+      } catch (e) {
+        console.warn('Failed to consume purchase:', e);
+      }
     }
+
+    // Apply the purchase locally
+    applyPurchase(productKey);
+    return { success: true, status: PurchaseStatus.SUCCEEDED };
+
   } catch (e) {
+    // User cancelled or payment failed
+    if (e.name === 'AbortError') {
+      return { success: false, status: PurchaseStatus.NOT_PURCHASED };
+    }
     console.error('Purchase failed:', e);
     return { success: false, status: PurchaseStatus.NETWORK_ERROR, error: e };
   }
@@ -229,7 +179,6 @@ const applyPurchase = (productKey) => {
 
   if (product.type === 'bundle') {
     unlockBundle(product.id, product.includes);
-    // Premium bundle also includes bonus coins
     if (product.bonusCoins) {
       applyPackPurchase(`bonus_coins_${product.bonusCoins}`);
     }
@@ -238,36 +187,34 @@ const applyPurchase = (productKey) => {
   } else if (product.type === 'skin') {
     unlockItem('skins', product.id);
   } else if (product.type === 'consumable') {
-    // Apply consumable pack (coins, spins, hints, undos, shields, mega bundles)
     applyPackPurchase(product.id);
   }
 };
 
-// Check owned products from Store
+// Sync owned purchases from Store (restore purchases)
 export const syncPurchases = async () => {
-  const context = await getStoreContext();
-
-  if (!context) {
+  const service = await getService();
+  if (!service) {
     console.log('Store not available, using local purchases');
     return;
   }
 
   try {
-    // Get user's owned add-ons
-    const addOns = await context.getAppLicenseAsync();
+    const purchases = await service.listPurchases();
 
-    if (addOns?.addOnLicenses) {
-      addOns.addOnLicenses.forEach((license, storeId) => {
-        if (license.isActive) {
-          // Find the product by storeId and unlock it
-          const productKey = Object.keys(STORE_PRODUCTS).find(
-            key => STORE_PRODUCTS[key].storeId === storeId
-          );
-          if (productKey) {
-            applyPurchase(productKey);
-          }
+    for (const purchase of purchases) {
+      // Find matching product by itemId
+      const productKey = Object.keys(STORE_PRODUCTS).find(
+        key => STORE_PRODUCTS[key].itemId === purchase.itemId
+      );
+
+      if (productKey) {
+        const product = STORE_PRODUCTS[productKey];
+        // Only restore durable/bundle purchases (not consumables)
+        if (product.type !== 'consumable') {
+          applyPurchase(productKey);
         }
-      });
+      }
     }
   } catch (e) {
     console.error('Failed to sync purchases:', e);
@@ -276,10 +223,9 @@ export const syncPurchases = async () => {
 
 // Get product info with prices from Store
 export const getProductInfo = async (productKeys) => {
-  const context = await getStoreContext();
+  const service = await getService();
 
-  if (!context) {
-    // Return default prices if Store not available
+  if (!service) {
     return productKeys.map(key => ({
       key,
       ...STORE_PRODUCTS[key],
@@ -289,18 +235,34 @@ export const getProductInfo = async (productKeys) => {
   }
 
   try {
-    const storeIds = productKeys.map(key => STORE_PRODUCTS[key].storeId);
-    const products = await context.getStoreProductsAsync(['Durable', 'Consumable'], storeIds);
+    const itemIds = productKeys.map(key => STORE_PRODUCTS[key].itemId);
+    const details = await service.getDetails(itemIds);
 
     return productKeys.map(key => {
-      const storeId = STORE_PRODUCTS[key].storeId;
-      const product = products.products.get(storeId);
+      const product = STORE_PRODUCTS[key];
+      const detail = details.find(d => d.itemId === product.itemId);
+
+      if (detail) {
+        const priceStr = new Intl.NumberFormat(
+          navigator.language || 'en-US',
+          { style: 'currency', currency: detail.price.currency }
+        ).format(detail.price.value);
+
+        return {
+          key,
+          ...product,
+          price: priceStr,
+          title: detail.title,
+          description: detail.description,
+          available: true
+        };
+      }
 
       return {
         key,
-        ...STORE_PRODUCTS[key],
-        price: product?.price?.formattedPrice || getDefaultPrice(key),
-        available: !!product
+        ...product,
+        price: getDefaultPrice(key),
+        available: true
       };
     });
   } catch (e) {
@@ -314,10 +276,9 @@ export const getProductInfo = async (productKeys) => {
   }
 };
 
-// Default prices for when Store is not available
+// Default prices (shown when Store API is not available)
 const getDefaultPrice = (productKey) => {
   const prices = {
-    // Durable products
     theme_neon: '$0.99',
     theme_ocean: '$0.99',
     theme_sunset: '$0.99',
@@ -329,7 +290,6 @@ const getDefaultPrice = (productKey) => {
     skin_bundle: '$2.99',
     difficulty_pack: '$1.99',
     premium_bundle: '$4.99',
-    // Consumable products
     coins_500: '$0.99',
     coins_1200: '$1.99',
     coins_5000: '$4.99',

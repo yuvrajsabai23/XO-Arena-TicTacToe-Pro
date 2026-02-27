@@ -4,7 +4,7 @@ import { themes, themeBundle } from '../themes/themes';
 import { skins, skinBundle } from '../themes/skins';
 import { difficultyConfig, difficultyPack } from '../logic/minimax';
 import { isItemOwned, premiumBundle, getSelectedItems, setSelectedItem } from '../store/purchases';
-import { purchaseProduct, isStoreAvailable } from '../store/msStore';
+import { purchaseProduct, isStoreAvailable, PurchaseStatus } from '../store/msStore';
 import {
   getCoins, getHints, getUndos, getShields, getSpins,
   COIN_PACKS, SPIN_PACKS, CONSUMABLE_PACKS, MEGA_BUNDLES
@@ -115,6 +115,7 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
   const [selected, setSelected] = useState(getSelectedItems());
   const [previewSkin, setPreviewSkin] = useState(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [purchaseError, setPurchaseError] = useState(null);
   const [showLuckySpin, setShowLuckySpin] = useState(false);
   const [consumables, setConsumables] = useState({
     coins: 0, hints: 0, undos: 0, shields: 0, spins: 0
@@ -146,6 +147,7 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
 
   const handlePurchase = async (productKey) => {
     setPurchasing(productKey);
+    setPurchaseError(null);
     try {
       const result = await purchaseProduct(productKey);
       if (result.success) {
@@ -154,9 +156,19 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
         if (onPurchaseComplete) {
           onPurchaseComplete();
         }
+      } else if (result.status === PurchaseStatus.SERVER_ERROR) {
+        setPurchaseError('Store not available. Please open the app from Microsoft Store.');
+        setTimeout(() => setPurchaseError(null), 4000);
+      } else if (result.status === PurchaseStatus.NOT_PURCHASED) {
+        // User cancelled — no error needed
+      } else {
+        setPurchaseError('Purchase failed. Please try again.');
+        setTimeout(() => setPurchaseError(null), 4000);
       }
     } catch (e) {
       console.error('Purchase error:', e);
+      setPurchaseError('Something went wrong. Please try again.');
+      setTimeout(() => setPurchaseError(null), 4000);
     }
     setPurchasing(null);
   };
@@ -198,6 +210,34 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
         overflow: 'hidden'
       }}
     >
+      {/* Purchase Error Toast */}
+      <AnimatePresence>
+        {purchaseError && (
+          <motion.div
+            initial={{ opacity: 0, y: -40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
+            style={{
+              position: 'fixed',
+              top: 20,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: 'rgba(220, 50, 50, 0.95)',
+              color: '#fff',
+              padding: '12px 24px',
+              borderRadius: '12px',
+              fontSize: '14px',
+              fontWeight: 600,
+              zIndex: 9999,
+              backdropFilter: 'blur(10px)',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.4)'
+            }}
+          >
+            {purchaseError}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Animated Background */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
         {/* Floating orbs */}
