@@ -200,9 +200,8 @@ export const purchaseProduct = async (productKey) => {
   const context = await getStoreContext();
 
   if (!context) {
-    // For development/testing without Store - simulate purchase
-    console.log('Simulating purchase for:', productKey);
-    return simulatePurchase(productKey);
+    console.warn('Microsoft Store not available — purchase blocked');
+    return { success: false, status: PurchaseStatus.SERVER_ERROR };
   }
 
   try {
@@ -242,28 +241,6 @@ const applyPurchase = (productKey) => {
     // Apply consumable pack (coins, spins, hints, undos, shields, mega bundles)
     applyPackPurchase(product.id);
   }
-};
-
-// Simulate purchase for development/testing
-const simulatePurchase = (productKey) => {
-  const product = STORE_PRODUCTS[productKey];
-
-  // In development, just unlock the item
-  if (product.type === 'bundle') {
-    unlockBundle(product.id, product.includes);
-    if (product.bonusCoins) {
-      applyPackPurchase(`bonus_coins_${product.bonusCoins}`);
-    }
-  } else if (product.type === 'theme') {
-    unlockItem('themes', product.id);
-  } else if (product.type === 'skin') {
-    unlockItem('skins', product.id);
-  } else if (product.type === 'consumable') {
-    // Apply consumable pack
-    applyPackPurchase(product.id);
-  }
-
-  return { success: true, status: PurchaseStatus.SUCCEEDED, simulated: true };
 };
 
 // Check owned products from Store
@@ -341,32 +318,32 @@ export const getProductInfo = async (productKeys) => {
 const getDefaultPrice = (productKey) => {
   const prices = {
     // Durable products
-    theme_neon: '$2.99',
-    theme_ocean: '$2.99',
-    theme_sunset: '$2.99',
-    theme_minimal: '$2.99',
-    theme_bundle: '$7.99',
-    skin_flame: '$3.99',
-    skin_galaxy: '$3.99',
-    skin_pixel: '$3.99',
-    skin_bundle: '$8.99',
-    difficulty_pack: '$4.99',
-    premium_bundle: '$19.99',
+    theme_neon: '$0.99',
+    theme_ocean: '$0.99',
+    theme_sunset: '$0.99',
+    theme_minimal: '$0.99',
+    theme_bundle: '$2.99',
+    skin_flame: '$0.99',
+    skin_galaxy: '$0.99',
+    skin_pixel: '$0.99',
+    skin_bundle: '$2.99',
+    difficulty_pack: '$1.99',
+    premium_bundle: '$4.99',
     // Consumable products
-    coins_500: '$4.99',
-    coins_1200: '$9.99',
-    coins_5000: '$19.99',
-    spin_1: '$1.99',
-    spin_10: '$9.99',
-    spin_25: '$19.99',
-    hint_pack_10: '$2.99',
-    hint_pack_30: '$6.99',
-    undo_pack_10: '$1.99',
-    undo_pack_30: '$4.99',
-    shield_pack_5: '$3.99',
-    mega_starter: '$9.99',
-    mega_pro: '$14.99',
-    mega_legend: '$19.99'
+    coins_500: '$0.99',
+    coins_1200: '$1.99',
+    coins_5000: '$4.99',
+    spin_1: '$0.99',
+    spin_10: '$1.99',
+    spin_25: '$3.99',
+    hint_pack_10: '$0.99',
+    hint_pack_30: '$1.99',
+    undo_pack_10: '$0.99',
+    undo_pack_30: '$1.99',
+    shield_pack_5: '$0.99',
+    mega_starter: '$2.99',
+    mega_pro: '$4.99',
+    mega_legend: '$6.99'
   };
   return prices[productKey] || '$0.99';
 };
