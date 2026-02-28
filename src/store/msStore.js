@@ -13,12 +13,17 @@ export const isStoreAvailable = () => {
   return 'getDigitalGoodsService' in window;
 };
 
+// Store the last error for debugging
+let lastError = null;
+export const getLastError = () => lastError;
+
 // Initialize the Digital Goods Service
 const getService = async () => {
   if (digitalGoodsService) return digitalGoodsService;
 
   if (!isStoreAvailable()) {
-    console.log('Digital Goods API not available — not installed from Store');
+    lastError = 'Digital Goods API not available (getDigitalGoodsService not in window)';
+    console.log(lastError);
     return null;
   }
 
@@ -28,7 +33,8 @@ const getService = async () => {
     );
     return digitalGoodsService;
   } catch (e) {
-    console.error('Failed to connect to Microsoft Store Billing:', e);
+    lastError = `Store Billing connect failed: ${e.message || e}`;
+    console.error(lastError, e);
     return null;
   }
 };
@@ -128,8 +134,9 @@ export const purchaseProduct = async (productKey) => {
 
   const service = await getService();
   if (!service) {
-    console.warn('Store not available — purchase blocked');
-    return { success: false, status: PurchaseStatus.SERVER_ERROR };
+    const err = lastError || 'Store service returned null';
+    console.warn('Store not available:', err);
+    return { success: false, status: PurchaseStatus.SERVER_ERROR, error: err };
   }
 
   try {
@@ -168,8 +175,9 @@ export const purchaseProduct = async (productKey) => {
     if (e.name === 'AbortError') {
       return { success: false, status: PurchaseStatus.NOT_PURCHASED };
     }
-    console.error('Purchase failed:', e);
-    return { success: false, status: PurchaseStatus.NETWORK_ERROR, error: e };
+    lastError = `Purchase error: ${e.name}: ${e.message || e}`;
+    console.error(lastError, e);
+    return { success: false, status: PurchaseStatus.NETWORK_ERROR, error: lastError };
   }
 };
 

@@ -4,7 +4,7 @@ import { themes, themeBundle } from '../themes/themes';
 import { skins, skinBundle } from '../themes/skins';
 import { difficultyConfig, difficultyPack } from '../logic/minimax';
 import { isItemOwned, premiumBundle, getSelectedItems, setSelectedItem } from '../store/purchases';
-import { purchaseProduct, isStoreAvailable, PurchaseStatus } from '../store/msStore';
+import { purchaseProduct, isStoreAvailable, PurchaseStatus, getLastError } from '../store/msStore';
 import {
   getCoins, getHints, getUndos, getShields, getSpins,
   COIN_PACKS, SPIN_PACKS, CONSUMABLE_PACKS, MEGA_BUNDLES
@@ -157,18 +157,20 @@ const StoreScreen = ({ onBack, onPurchaseComplete }) => {
           onPurchaseComplete();
         }
       } else if (result.status === PurchaseStatus.SERVER_ERROR) {
-        setPurchaseError('Store not available. Please open the app from Microsoft Store.');
-        setTimeout(() => setPurchaseError(null), 4000);
+        const detail = result.error || getLastError() || '';
+        setPurchaseError(`Store not available: ${detail}`);
+        setTimeout(() => setPurchaseError(null), 8000);
       } else if (result.status === PurchaseStatus.NOT_PURCHASED) {
         // User cancelled — no error needed
       } else {
-        setPurchaseError('Purchase failed. Please try again.');
-        setTimeout(() => setPurchaseError(null), 4000);
+        const detail = result.error || getLastError() || '';
+        setPurchaseError(`Purchase failed: ${detail}`);
+        setTimeout(() => setPurchaseError(null), 8000);
       }
     } catch (e) {
       console.error('Purchase error:', e);
-      setPurchaseError('Something went wrong. Please try again.');
-      setTimeout(() => setPurchaseError(null), 4000);
+      setPurchaseError(`Error: ${e.message || e}`);
+      setTimeout(() => setPurchaseError(null), 8000);
     }
     setPurchasing(null);
   };
